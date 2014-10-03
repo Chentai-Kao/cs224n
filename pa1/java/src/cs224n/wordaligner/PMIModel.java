@@ -19,8 +19,8 @@ public class PMIModel implements WordAligner {
   
   // TODO: Use arrays or Counters for collecting sufficient statistics
   // from the training data.
-  private Counter<String> sourceCounts;
-  private Counter<String> targetCounts;
+  private Counter<String> sourceProb;
+  private Counter<String> targetProb;
   private CounterMap<String,String> sourceTargetCounts;
 
   public Alignment align(SentencePair sentencePair) {
@@ -33,13 +33,13 @@ public class PMIModel implements WordAligner {
 
     for (int tgtIndex = 0; tgtIndex < numTargetWords; tgtIndex++) {
       String targetWord = sentencePair.getTargetWords().get(tgtIndex);
-      double pTgt = targetCounts.getCount(targetWord);
+      double pTgt = targetProb.getCount(targetWord);
       double maxP = 0.0;
       int maxSrcIndex = -1;
       for (int srcIndex = 0; srcIndex < numSourceWords; srcIndex++) {
         String sourceWord = sentencePair.getSourceWords().get(srcIndex);
-        double pSrcTgt = sourceTargetCounts.getCount(sourceWord, targetWord);
-        double pSrc = sourceCounts.getCount(sourceWord);
+        double pSrcTgt = sourceTargetCounts.getCount(sourceWord, targetWord) / sourceTargetCounts.totalCount();
+        double pSrc = sourceProb.getCount(sourceWord);
         double p = java.lang.Math.log(pSrcTgt) - java.lang.Math.log(pSrc) - java.lang.Math.log(pTgt);
         if (p > maxP) {
           maxP = p;
@@ -52,17 +52,17 @@ public class PMIModel implements WordAligner {
   }
 
   public void train(List<SentencePair> trainingPairs) {
-    sourceCounts = new Counter<String>();
-    targetCounts = new Counter<String>();
+    sourceProb = new Counter<String>();
+    targetProb = new Counter<String>();
     sourceTargetCounts = new CounterMap<String,String>();
     for(SentencePair pair : trainingPairs){
       List<String> sourceWords = pair.getSourceWords();
       List<String> targetWords = pair.getTargetWords();
       for(String source : sourceWords){
-        sourceCounts.incrementCount(source, 1.0);
+        sourceProb.incrementCount(source, 1.0);
       }
       for(String target : targetWords){
-        targetCounts.incrementCount(target, 1.0);
+        targetProb.incrementCount(target, 1.0);
       }
       for(String source : sourceWords){
         for(String target : targetWords){
@@ -71,8 +71,7 @@ public class PMIModel implements WordAligner {
         }
       }
     }
-    sourceCounts = Counters.normalize(sourceCounts);
-    targetCounts = Counters.normalize(targetCounts);
-    sourceTargetCounts = Counters.conditionalNormalize(sourceTargetCounts);
+    sourceProb = Counters.normalize(sourceProb);
+    targetProb = Counters.normalize(targetProb);
   }
 }
