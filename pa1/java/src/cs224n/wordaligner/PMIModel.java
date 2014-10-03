@@ -19,6 +19,8 @@ public class PMIModel implements WordAligner {
   
   // TODO: Use arrays or Counters for collecting sufficient statistics
   // from the training data.
+  private Counter<String> sourceCounts;
+  private Counter<String> targetCounts;
   private CounterMap<String,String> sourceTargetCounts;
 
   public Alignment align(SentencePair sentencePair) {
@@ -29,25 +31,43 @@ public class PMIModel implements WordAligner {
     int numSourceWords = sentencePair.getSourceWords().size();
     int numTargetWords = sentencePair.getTargetWords().size();
 
-    for (int srcIndex = 0; srcIndex < numSourceWords; srcIndex++) {
-      int tgtIndex = srcIndex;
-      if (tgtIndex < numTargetWords) {
-        // Discard null alignments
-        alignment.addPredictedAlignment(tgtIndex, srcIndex);
+    for (int tgtIndex = 0; tgtIndex < numTargetWords; tgtIndex++) {
+      String targetWord = sentencePair.getTargetWords().get(tgtIndex);
+      double pTgt = targetCounts.getCount(targetWord) / targetCounts.totalCount();
+      double maxP = 0.0;
+      int maxSrcIndex = -1;
+      for (int srcIndex = 0; srcIndex < numSourceWords; srcIndex++) {
+        String sourceWord = sentencePair.getSourceWords().get(srcIndex);
+        double pSrcTgt = sourceTargetCounts.getCount(sourceWord, targetWord) / sourceTargetCounts.totalCount();
+        double pSrc = sourceCounts.getCount(sourceWord) / sourceCounts.totalCount();
+        double p = java.lang.Math.log(pSrcTgt) - java.lang.Math.log(pSrc) - java.lang.Math.log(pTgt);
+        if (p > maxP) {
+          maxP = p;
+          maxSrcIndex = srcIndex;
+        }
       }
+      alignment.addPredictedAlignment(tgtIndex, maxSrcIndex);
     }
     return alignment;
   }
 
   public void train(List<SentencePair> trainingPairs) {
+    sourceCounts = new Counter<String>();
+    targetCounts = new Counter<String>();
     sourceTargetCounts = new CounterMap<String,String>();
     for(SentencePair pair : trainingPairs){
-      List<String> targetWords = pair.getTargetWords();
       List<String> sourceWords = pair.getSourceWords();
+      List<String> targetWords = pair.getTargetWords();
+      for(String source : sourceWords){
+        sourceCounts.incrementCount(source, 1.0);
+      }
+      for(String target : targetWords){
+        targetCounts.incrementCount(target, 1.0);
+      }
       for(String source : sourceWords){
         for(String target : targetWords){
           // TODO: Warm-up. Your code here for collecting sufficient statistics.
-          sourceTargetCounts.setCount(source, target, 1.0);
+          sourceTargetCounts.incrementCount(source, target, 1.0);
         }
       }
     }
