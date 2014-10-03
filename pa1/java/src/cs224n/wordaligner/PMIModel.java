@@ -33,13 +33,13 @@ public class PMIModel implements WordAligner {
 
     for (int tgtIndex = 0; tgtIndex < numTargetWords; tgtIndex++) {
       String targetWord = sentencePair.getTargetWords().get(tgtIndex);
-      double pTgt = targetCounts.getCount(targetWord) / targetCounts.totalCount();
+      double pTgt = targetCounts.getCount(targetWord);
       double maxP = 0.0;
       int maxSrcIndex = -1;
       for (int srcIndex = 0; srcIndex < numSourceWords; srcIndex++) {
         String sourceWord = sentencePair.getSourceWords().get(srcIndex);
-        double pSrcTgt = sourceTargetCounts.getCount(sourceWord, targetWord) / sourceTargetCounts.totalCount();
-        double pSrc = sourceCounts.getCount(sourceWord) / sourceCounts.totalCount();
+        double pSrcTgt = sourceTargetCounts.getCount(sourceWord, targetWord);
+        double pSrc = sourceCounts.getCount(sourceWord);
         double p = java.lang.Math.log(pSrcTgt) - java.lang.Math.log(pSrc) - java.lang.Math.log(pTgt);
         if (p > maxP) {
           maxP = p;
@@ -71,5 +71,8 @@ public class PMIModel implements WordAligner {
         }
       }
     }
+    sourceCounts = Counters.normalize(sourceCounts);
+    targetCounts = Counters.normalize(targetCounts);
+    sourceTargetCounts = Counters.conditionalNormalize(sourceTargetCounts);
   }
 }
