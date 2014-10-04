@@ -50,7 +50,6 @@ public class IBMM1 implements WordAligner {
 
   public void train(List<SentencePair> trainingPairs) {
     // Start with P(f|e) uniform, including p(f|NULL).
-    sourceTargetCounts = new CounterMap<String,String>();
     sourceTargetProb = new CounterMap<String,String>();
     for(SentencePair pair : trainingPairs){
       List<String> sourceWords = pair.getSourceWords();
@@ -66,6 +65,7 @@ public class IBMM1 implements WordAligner {
     // Iterate EM until convergence.
     int numIter = 50;
     for(int iter = 0; iter < numIter; ++iter){
+      sourceTargetCounts = new CounterMap<String,String>();
       // E-step.
       for(SentencePair pair : trainingPairs){
         List<String> sourceWords = pair.getSourceWords();
