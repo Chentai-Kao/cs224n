@@ -63,7 +63,7 @@ public class IBMM1 implements WordAligner {
       }
     }
     // Iterate EM until convergence.
-    int numIter = 50;
+    int numIter = 20;
     for(int iter = 0; iter < numIter; ++iter){
       sourceTargetCounts = new CounterMap<String,String>();
       // E-step.
