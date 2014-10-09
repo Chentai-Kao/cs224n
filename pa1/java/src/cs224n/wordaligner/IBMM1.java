@@ -23,6 +23,10 @@ public class IBMM1 implements WordAligner {
   private CounterMap<String,String> sourceTargetCounts;
   private CounterMap<String,String> sourceTargetProb;
 
+  public CounterMap<String,String> getSourceTargetProb() {
+    return sourceTargetProb;
+  }
+
   public Alignment align(SentencePair sentencePair) {
     // Placeholder code below. 
     // TODO Implement an inference algorithm for Eq.1 in the assignment
