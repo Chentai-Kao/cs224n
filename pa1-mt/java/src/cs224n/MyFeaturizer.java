@@ -1,5 +1,6 @@
 package edu.stanford.nlp.mt.decoder.feat;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import edu.stanford.nlp.mt.util.FeatureValue;
@@ -24,8 +25,12 @@ public class MyFeaturizer implements RuleFeaturizer<IString, String> {
 
     // TODO: Return a list of features for the rule. Replace these lines
     // with your own feature.
-    List<FeatureValue<String>> features = Generics.newLinkedList();
-    features.add(new FeatureValue<String>("MyFeature", 1.0));
+    List<FeatureValue<String>> features =
+      new LinkedList<FeatureValue<String>>();
+    features.add(new FeatureValue<String>(
+          String.format("Length_correlation:%d",
+                        f.targetPhrase.size() - f.sourcePhrase.size()),
+          1.0));
     return features;
   }
 
