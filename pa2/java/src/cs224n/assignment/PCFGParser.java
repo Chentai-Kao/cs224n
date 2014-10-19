@@ -13,6 +13,9 @@ public class PCFGParser implements Parser {
     public void train(List<Tree<String>> trainTrees) {
         // TODO: before you generate your grammar, the training trees
         // need to be binarized so that rules are at most binary
+        for (Tree<String>tree : trainTrees) {
+          tree = TreeAnnotations.annotateTree(tree);
+        }
         lexicon = new Lexicon(trainTrees);
         grammar = new Grammar(trainTrees);
     }
