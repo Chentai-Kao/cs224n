@@ -21,66 +21,109 @@ public class PCFGParser implements Parser {
     // Example (in a cell(i, j)): A -> BC (score: 0.5)
     //                            "(i, j)": { A: (0.5, Triple(split, B, C)) }
     private HashMap<String,
-                    HashMap<String,
-                            Pair<Double,
-                                 Triplet<Integer, String, String>>>> data;
+    HashMap<String,
+    Pair<Double,
+    Triplet<Integer, String, String>>>> data;
 
     public void train(List<Tree<String>> trainTrees) {
         // TODO: before you generate your grammar, the training trees
         // need to be binarized so that rules are at most binary
         for (Tree<String>tree : trainTrees) {
-          tree = TreeAnnotations.annotateTree(tree);
+            tree = TreeAnnotations.annotateTree(tree);
         }
         lexicon = new Lexicon(trainTrees);
         grammar = new Grammar(trainTrees);
         data = new HashMap<String,
-                           HashMap<String,
-                                   Pair<Double, Triplet<Integer, String, String>>>>();
+                HashMap<String,
+                Pair<Double, Triplet<Integer, String, String>>>>();
     }
 
     public Tree<String> getBestParse(List<String> sentence) {
         // TODO: implement this method
-    	int numWords = sentence.size();
+        int numWords = sentence.size();
+
         // Initialize the data.
-    	for (int i = 0; i < numWords + 1; ++i) {
-    	    for (int j = 0; j < numWords + 1; ++j) {
-    	        data.put(getIndexKey(i, j),
-    	                 new HashMap<String,
-                                     Pair<Double, Triplet<Integer, String, String>>>());
-    	    }
-    	}
-    	for (int i = 0; i < numWords; ++i) {
-    	    String word = sentence.get(i);
-            // The set of pre-terminals (will be updated later).
-            Set<String> preTerminals = new HashSet<String>();
+        for (int i = 0; i < numWords + 1; ++i) {
+            for (int j = 0; j < numWords + 1; ++j) {
+                data.put(getIndexKey(i, j),
+                        new HashMap<String,
+                        Pair<Double, Triplet<Integer, String, String>>>());
+            }
+        }
+        // Leaf layer of the matrix.
+        for (int i = 0; i < numWords; ++i) {
+            String word = sentence.get(i);
+            // The set of unaries to fix later.
+            Set<String> unariesToFix = new HashSet<String>();
             // Build leaf layer.
-    	    for (Grammar.UnaryRule rule : grammar.getUnaryRulesByChild(word)) {
-    	        String tag = rule.getParent();
-    	        String key = getIndexKey(i, i + 1);
-    	        double score = rule.getScore();
-    	        data.get(key).put(tag, createScoreAndBackPair(
-    	                score, null, null, null));
-    	        preTerminals.add(tag); // update the pre-terminals
-    	    }
-    	    // Handle unaries.
-    	    Boolean added = true;
-    	    while (added) {
-    	        added = false;
-    	        for (String B : preTerminals) {
-    	            for (Grammar.UnaryRule ruleA : grammar.getUnaryRulesByChild(B)) {
-    	                String A = ruleA.getParent();
-    	                double prob = ruleA.getScore() * getScoreFromData(i, i + 1, B);
-    	                if (prob > getScoreFromData(i, i + 1, A)) {
-    	                    String key = getIndexKey(i, i + 1);
-    	                    data.get(key).put(A, createScoreAndBackPair(
-    	                            prob, null, B, null));
-    	                    added = true;
-    	                    preTerminals.add(A); // update the pre-terminals
-    	                }
-    	            }
-    	        }
-    	    }
-    	}
+            for (Grammar.UnaryRule rule : grammar.getUnaryRulesByChild(word)) {
+                String A = rule.getParent();
+                setData(i, i + 1, A, rule.getScore(), null, null, null);
+                unariesToFix.add(A); // collect the unaries to fix.
+            }
+            // Handle unaries.
+            while (!unariesToFix.isEmpty()) {
+                Set<String> newFix = new HashSet<String>();
+                for (String B : unariesToFix) {
+                    for (Grammar.UnaryRule ruleAB : grammar.getUnaryRulesByChild(B)) {
+                        String A = ruleAB.getParent();
+                        double prob = ruleAB.getScore() * getScoreFromData(i, i + 1, B);
+                        if (prob > getScoreFromData(i, i + 1, A)) {
+                            setData(i, i + 1, A, prob, null, B, null);
+                            newFix.add(A); // update the unaries to fix in the next round.
+                        }
+                    }
+                }
+                unariesToFix = newFix;
+            }
+        }
+        // Fill all remaining cells of the matrix.
+        for (int span = 2; span <= numWords; ++span) {
+            for (int begin = 0; begin <= numWords - span; ++begin) {
+                int end = begin + span;
+                // The set of non-terminals (will be updated later).
+                Set<String> unariesToFix = new HashSet<String>();
+                // Binary rules.
+                for (int split = begin + 1; split <= end - 1; ++split) {
+                    for (String B : data.get(getIndexKey(begin, split)).keySet()) {
+                        // Collect all rules containing B as a child (left/right).
+                        List<Grammar.BinaryRule> rules = grammar.getBinaryRulesByLeftChild(B);
+                        rules.addAll(grammar.getBinaryRulesByRightChild(B));
+                        // Iterate all rules (containing B), do things if C is also a child
+                        // of the rule. That is, A->BC or A->CB.
+                        for (Grammar.BinaryRule r : rules) {
+                            for (String C : data.get(getIndexKey(split, end)).keySet()) {
+                                if (r.getLeftChild().equals(C) || r.getRightChild().equals(C)) {
+                                    double prob = getScoreFromData(begin, split, B) *
+                                            getScoreFromData(split, end, C) *
+                                            r.getScore();
+                                    String A = r.getParent();
+                                    if (prob > getScoreFromData(begin, end, A)) {
+                                        setData(begin, end, A, prob, split, B, C);
+                                        unariesToFix.add(A);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // Handle unaries.
+                while (!unariesToFix.isEmpty()) {
+                    Set<String> newFix = new HashSet<String>();
+                    for (String B : unariesToFix) {
+                        for (Grammar.UnaryRule ruleAB : grammar.getUnaryRulesByChild(B)) {
+                            String A = ruleAB.getParent();
+                            double prob = ruleAB.getScore() * getScoreFromData(begin, end, B);
+                            if (prob > getScoreFromData(begin, end, A)) {
+                                setData(begin, end, A, prob, null, B, null);
+                                newFix.add(A); // update the unaries to fix in the next round.
+                            }
+                        }
+                    }
+                    unariesToFix = newFix;
+                }
+            }
+        }
         return null;
     }
 
@@ -88,7 +131,7 @@ public class PCFGParser implements Parser {
         return "(" + i.toString() + ", " + j.toString() + ")";
     }
 
-    Pair<Double, Triplet<Integer, String, String>> createScoreAndBackPair(
+    private Pair<Double, Triplet<Integer, String, String>> createScoreAndBackPair(
             double score, Integer split, String B, String C) {
         // If this rule is pointing to the actual word, set triplet to null.
         if (split == null && B == null && C == null) {
@@ -97,17 +140,20 @@ public class PCFGParser implements Parser {
         }
         // A normal rule (unary or binary).
         Triplet<Integer, String, String> back =
-                new Triplet<Integer, String, String>(
-                        split, B, C);
-        return new Pair<Double, Triplet<Integer, String, String>>(
-                        score, back);
+                new Triplet<Integer, String, String>(split, B, C);
+        return new Pair<Double, Triplet<Integer, String, String>>(score, back);
     }
-    
-    double getScoreFromData(Integer begin_idx, Integer end_idx, String A) {
+
+    private double getScoreFromData(Integer begin_idx, Integer end_idx, String A) {
         String key = getIndexKey(begin_idx, end_idx);
         if (!data.get(key).containsKey(A)) {
             return 0.0;
         }
         return data.get(key).get(A).getFirst();
+    }
+
+    private void setData(Integer begin_idx, Integer end_idx, String A, double score, Integer split, String B, String C) {
+        String key = getIndexKey(begin_idx, end_idx);
+        data.get(key).put(A, createScoreAndBackPair(score, split, B, C));
     }
 }
