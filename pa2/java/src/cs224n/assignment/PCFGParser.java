@@ -131,8 +131,10 @@ public class PCFGParser implements Parser {
         String key = getIndexKey(0, numWords);
         String maxA = null;
         Double maxValue = -Double.MAX_VALUE;
+        System.out.println("========== finding maxA ==========");
         for (String A : data.get(key).keySet()) {
             double score = getScoreFromData(0, numWords, A);
+            System.out.println(A + ": score = " + score + "(maxValue, maxA)=(" + maxValue + "," + maxA + ")");
             if (score > maxValue) {
                 maxValue = score;
                 maxA = A;
