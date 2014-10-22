@@ -183,17 +183,16 @@ public class PCFGParser implements Parser {
     private Tree<String> buildTree(Integer begin_idx, Integer end_idx, String A, List<String> sentence) {
         Tree<String> tree = new Tree<String>(A);
         List<Tree<String>> children = new ArrayList<Tree<String>>();
-        // Get useful variables.
         Triplet<Integer, String, String> back = getBackPointerFromData(begin_idx, end_idx, A);
         if (back == null) {
             // Pre-terminal, one layer up from leaf node.
             String word = sentence.get(begin_idx);
             children.add(new Tree<String>(word));
         } else {
+            // Get useful variables.
             Integer split = back.getFirst();
             String B = back.getSecond();
-            String C = back.getThird();
-        
+            String C = back.getThird();        
             if (split == null && C == null) {
                 // Unary rule. Recursively call this function.
                 children.add(buildTree(begin_idx, end_idx, B, sentence));
