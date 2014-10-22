@@ -60,8 +60,8 @@ public class PCFGParser implements Parser {
             Set<String> unariesToFix = new HashSet<String>();
             // Build leaf layer.
             for (String A : lexicon.getAllTags()) {
-                Double score = lexicon.scoreTagging(word, A);
-                if (score.compareTo(0.0) > 0) {
+                double score = lexicon.scoreTagging(word, A);
+                if (score > 0.0) {
                     setScoreToData(i, i + 1, A, score, null, null, null);
                     unariesToFix.add(A); // collect the unaries to fix.
                 }
@@ -72,8 +72,8 @@ public class PCFGParser implements Parser {
                 for (String B : unariesToFix) {
                     for (Grammar.UnaryRule ruleAB : grammar.getUnaryRulesByChild(B)) {
                         String A = ruleAB.getParent();
-                        Double prob = ruleAB.getScore() * getScoreFromData(i, i + 1, B);
-                        if (prob.compareTo(getScoreFromData(i, i + 1, A)) > 0) {
+                        double prob = ruleAB.getScore() * getScoreFromData(i, i + 1, B);
+                        if (prob > getScoreFromData(i, i + 1, A)) {
                             setScoreToData(i, i + 1, A, prob, null, B, null);
                             newFix.add(A); // update the unaries to fix in the next round.
                         }
@@ -94,24 +94,15 @@ public class PCFGParser implements Parser {
                         // Collect all rules containing B as a child (left/right).
                         List<Grammar.BinaryRule> rules = new ArrayList<Grammar.BinaryRule>();
                         rules.addAll(grammar.getBinaryRulesByLeftChild(B));
-                        //rules.addAll(grammar.getBinaryRulesByRightChild(B));
-
                         // Iterate all rules (containing B), do things if C is also a child
                         // of the rule. That is, A->BC or A->CB.
                         for (Grammar.BinaryRule r : rules) {
                             for (String C : data.get(getIndexKey(split, end)).keySet()) {
-                                //if (r.getLeftChild().equals(C) || r.getRightChild().equals(C)) {
                                 if (r.getRightChild().equals(C)) {
                                     double prob = getScoreFromData(begin, split, B) *
                                             getScoreFromData(split, end, C) *
                                             r.getScore();
                                     String A = r.getParent();
-                                    //System.out.println("(" + begin + "," + split + "," + end + "): (A, B, C) = (" +
-                                    //        getScoreFromData(begin, end, A) + "," +
-                                    //        getScoreFromData(begin, end, B) + "," +
-                                    //        getScoreFromData(begin, end, C) + "), A->BC: " +
-                                    //        r.getScore()
-                                    //        );
                                     if (prob > getScoreFromData(begin, end, A)) {
                                         setScoreToData(begin, end, A, prob, split, B, C);
                                         unariesToFix.add(A);
@@ -143,8 +134,8 @@ public class PCFGParser implements Parser {
         String maxA = null;
         Double maxValue = -Double.MAX_VALUE;
         for (String A : data.get(key).keySet()) {
-            Double score = getScoreFromData(0, numWords, A);
-            if (score.compareTo(maxValue) > 0) {
+            double score = getScoreFromData(0, numWords, A);
+            if (score > maxValue) {
                 maxValue = score;
                 maxA = A;
             }
