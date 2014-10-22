@@ -29,15 +29,17 @@ public class PCFGParser implements Parser {
     public void train(List<Tree<String>> trainTrees) {
         // TODO: before you generate your grammar, the training trees
         // need to be binarized so that rules are at most binary
+        List<Tree<String>> binarizedTrees = new ArrayList<Tree<String>>();
         for (Tree<String> tree : trainTrees) {
             System.out.println("----------------------");
             System.out.print(Trees.PennTreeRenderer.render(tree));
             System.out.println("--------");
-            tree = TreeAnnotations.annotateTree(tree);
-            System.out.print(Trees.PennTreeRenderer.render(tree));
+            Tree<String> binarizedTree = TreeAnnotations.annotateTree(tree);
+            binarizedTrees.add(binarizedTree);
+            System.out.print(Trees.PennTreeRenderer.render(binarizedTree));
         }
-        lexicon = new Lexicon(trainTrees);
-        grammar = new Grammar(trainTrees);
+        lexicon = new Lexicon(binarizedTrees);
+        grammar = new Grammar(binarizedTrees);
         data = new HashMap<String,
                 HashMap<String,
                 Pair<Double, Triplet<Integer, String, String>>>>();
