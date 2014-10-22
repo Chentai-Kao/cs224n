@@ -31,12 +31,8 @@ public class PCFGParser implements Parser {
         // need to be binarized so that rules are at most binary
         List<Tree<String>> binarizedTrees = new ArrayList<Tree<String>>();
         for (Tree<String> tree : trainTrees) {
-            System.out.println("----------------------");
-            System.out.print(Trees.PennTreeRenderer.render(tree));
-            System.out.println("--------");
             Tree<String> binarizedTree = TreeAnnotations.annotateTree(tree);
             binarizedTrees.add(binarizedTree);
-            System.out.print(Trees.PennTreeRenderer.render(binarizedTree));
         }
         lexicon = new Lexicon(binarizedTrees);
         grammar = new Grammar(binarizedTrees);
@@ -185,26 +181,27 @@ public class PCFGParser implements Parser {
     }
     
     private Tree<String> buildTree(Integer begin_idx, Integer end_idx, String A, List<String> sentence) {
-        // Get useful variables.
-        Triplet<Integer, String, String> back = getBackPointerFromData(begin_idx, end_idx, A);
-        Integer split = back.getFirst();
-        String B = back.getSecond();
-        String C = back.getThird();
-        // Create the tree
         Tree<String> tree = new Tree<String>(A);
         List<Tree<String>> children = new ArrayList<Tree<String>>();
-        // Different conditions.
-        if (B == null) {
+        // Get useful variables.
+        Triplet<Integer, String, String> back = getBackPointerFromData(begin_idx, end_idx, A);
+        if (back == null) {
             // Pre-terminal, one layer up from leaf node.
             String word = sentence.get(begin_idx);
             children.add(new Tree<String>(word));
-        } else if (split == null && C == null) {
-            // Unary rule. Recursively call this function.
-            children.add(buildTree(begin_idx, end_idx, B, sentence));
         } else {
-            // Binary rule.
-            children.add(buildTree(begin_idx, split, B, sentence));
-            children.add(buildTree(split, end_idx, C, sentence));
+            Integer split = back.getFirst();
+            String B = back.getSecond();
+            String C = back.getThird();
+        
+            if (split == null && C == null) {
+                // Unary rule. Recursively call this function.
+                children.add(buildTree(begin_idx, end_idx, B, sentence));
+            } else {
+                // Binary rule.
+                children.add(buildTree(begin_idx, split, B, sentence));
+                children.add(buildTree(split, end_idx, C, sentence));
+            }
         }
         // Set children and return the tree.
         tree.setChildren(children);
