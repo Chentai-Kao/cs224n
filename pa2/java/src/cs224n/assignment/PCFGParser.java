@@ -54,17 +54,20 @@ public class PCFGParser implements Parser {
             }
         }
         // Leaf layer of the matrix.
+        System.out.println("------------ leaf layer ----------");
         for (int i = 0; i < numWords; ++i) {
             String word = sentence.get(i);
             // The set of unaries to fix later.
             Set<String> unariesToFix = new HashSet<String>();
             // Build leaf layer.
+            System.out.println("------------ build leaf layer ----------");
             for (Grammar.UnaryRule rule : grammar.getUnaryRulesByChild(word)) {
                 String A = rule.getParent();
                 setScoreToData(i, i + 1, A, rule.getScore(), null, null, null);
                 unariesToFix.add(A); // collect the unaries to fix.
             }
             // Handle unaries.
+            System.out.println("------------ handle unaries ----------");
             while (!unariesToFix.isEmpty()) {
                 Set<String> newFix = new HashSet<String>();
                 for (String B : unariesToFix) {
@@ -81,12 +84,14 @@ public class PCFGParser implements Parser {
             }
         }
         // Fill all remaining cells of the matrix.
+        System.out.println("------------ remaining cells ----------");
         for (int span = 2; span <= numWords; ++span) {
             for (int begin = 0; begin <= numWords - span; ++begin) {
                 int end = begin + span;
                 // The set of non-terminals (will be updated later).
                 Set<String> unariesToFix = new HashSet<String>();
                 // Binary rules.
+                System.out.println("------------ binary rules ----------");
                 for (int split = begin + 1; split <= end - 1; ++split) {
                     for (String B : data.get(getIndexKey(begin, split)).keySet()) {
                         // Collect all rules containing B as a child (left/right).
@@ -110,6 +115,7 @@ public class PCFGParser implements Parser {
                         }
                     }
                 }
+                System.out.println("------------ handle unaries ----------");
                 // Handle unaries.
                 while (!unariesToFix.isEmpty()) {
                     Set<String> newFix = new HashSet<String>();
@@ -134,14 +140,14 @@ public class PCFGParser implements Parser {
         for (int i = 0; i < numWords; ++i) {
             for (int j = i + 1; j <= numWords; ++j) {
                 String k = getIndexKey(0, numWords);
-                System.out.println("------");
-                System.out.println(k);
-                System.out.println(data.get(k).keySet().toString());
+                //System.out.println("------");
+                //System.out.println(k);
+                //System.out.println(data.get(k).keySet().toString());
             }
         }
-        System.out.println("----------- find max ---------------");
-        System.out.println(key);
-        System.out.println(data.get(key).keySet().toString());
+        //System.out.println("----------- find max ---------------");
+        //System.out.println(key);
+        //System.out.println(data.get(key).keySet().toString());
         for (String A : data.get(key).keySet()) {
             Double score = getScoreFromData(0, numWords, A);
             if (score.compareTo(maxValue) > 0) {
