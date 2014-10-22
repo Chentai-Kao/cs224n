@@ -58,7 +58,7 @@ public class PCFGParser implements Parser {
             // Build leaf layer.
             for (Grammar.UnaryRule rule : grammar.getUnaryRulesByChild(word)) {
                 String A = rule.getParent();
-                setData(i, i + 1, A, rule.getScore(), null, null, null);
+                setScoreToData(i, i + 1, A, rule.getScore(), null, null, null);
                 unariesToFix.add(A); // collect the unaries to fix.
             }
             // Handle unaries.
@@ -69,7 +69,7 @@ public class PCFGParser implements Parser {
                         String A = ruleAB.getParent();
                         double prob = ruleAB.getScore() * getScoreFromData(i, i + 1, B);
                         if (prob > getScoreFromData(i, i + 1, A)) {
-                            setData(i, i + 1, A, prob, null, B, null);
+                            setScoreToData(i, i + 1, A, prob, null, B, null);
                             newFix.add(A); // update the unaries to fix in the next round.
                         }
                     }
@@ -99,7 +99,7 @@ public class PCFGParser implements Parser {
                                             r.getScore();
                                     String A = r.getParent();
                                     if (prob > getScoreFromData(begin, end, A)) {
-                                        setData(begin, end, A, prob, split, B, C);
+                                        setScoreToData(begin, end, A, prob, split, B, C);
                                         unariesToFix.add(A);
                                     }
                                 }
@@ -115,7 +115,7 @@ public class PCFGParser implements Parser {
                             String A = ruleAB.getParent();
                             double prob = ruleAB.getScore() * getScoreFromData(begin, end, B);
                             if (prob > getScoreFromData(begin, end, A)) {
-                                setData(begin, end, A, prob, null, B, null);
+                                setScoreToData(begin, end, A, prob, null, B, null);
                                 newFix.add(A); // update the unaries to fix in the next round.
                             }
                         }
@@ -124,7 +124,18 @@ public class PCFGParser implements Parser {
                 }
             }
         }
-        return null;
+        // Build tree. Find the maximum in the root cell, then build tree.
+        String key = getIndexKey(0, numWords);
+        String maxA = null;
+        Double maxValue = -Double.MAX_VALUE;
+        for (String A : data.get(key).keySet()) {
+            Double score = getScoreFromData(0, numWords, A);
+            if (score.compareTo(maxValue) > 0) {
+                maxValue = score;
+                maxA = A;
+            }
+        }
+        return buildTree(0, numWords, maxA, sentence);
     }
 
     private String getIndexKey(Integer i, Integer j) {
@@ -144,7 +155,7 @@ public class PCFGParser implements Parser {
         return new Pair<Double, Triplet<Integer, String, String>>(score, back);
     }
 
-    private double getScoreFromData(Integer begin_idx, Integer end_idx, String A) {
+    private Double getScoreFromData(Integer begin_idx, Integer end_idx, String A) {
         String key = getIndexKey(begin_idx, end_idx);
         if (!data.get(key).containsKey(A)) {
             return 0.0;
@@ -152,8 +163,44 @@ public class PCFGParser implements Parser {
         return data.get(key).get(A).getFirst();
     }
 
-    private void setData(Integer begin_idx, Integer end_idx, String A, double score, Integer split, String B, String C) {
+    private void setScoreToData(Integer begin_idx, Integer end_idx, String A, double score, Integer split, String B, String C) {
         String key = getIndexKey(begin_idx, end_idx);
         data.get(key).put(A, createScoreAndBackPair(score, split, B, C));
+    }
+    
+    private Triplet<Integer, String, String> getBackPointerFromData(
+            Integer begin_idx, Integer end_idx, String A) {
+        String key = getIndexKey(begin_idx, end_idx);
+        if (!data.get(key).containsKey(A)) {
+            return null;
+        }
+        return data.get(key).get(A).getSecond();
+    }
+    
+    private Tree<String> buildTree(Integer begin_idx, Integer end_idx, String A, List<String> sentence) {
+        // Get useful variables.
+        Triplet<Integer, String, String> back = getBackPointerFromData(begin_idx, end_idx, A);
+        Integer split = back.getFirst();
+        String B = back.getSecond();
+        String C = back.getThird();
+        // Create the tree
+        Tree<String> tree = new Tree<String>(A);
+        List<Tree<String>> children = new ArrayList<Tree<String>>();
+        // Different conditions.
+        if (B == null) {
+            // Pre-terminal, one layer up from leaf node.
+            String word = sentence.get(begin_idx);
+            children.add(new Tree<String>(word));
+        } else if (split == null && C == null) {
+            // Unary rule. Recursively call this function.
+            children.add(buildTree(begin_idx, end_idx, B, sentence));
+        } else {
+            // Binary rule.
+            children.add(buildTree(begin_idx, split, B, sentence));
+            children.add(buildTree(split, end_idx, C, sentence));
+        }
+        // Set children and return the tree.
+        tree.setChildren(children);
+        return tree;
     }
 }
