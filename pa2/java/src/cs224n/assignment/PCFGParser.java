@@ -98,7 +98,8 @@ public class PCFGParser implements Parser {
                 for (int split = begin + 1; split <= end - 1; ++split) {
                     for (String B : data.get(getIndexKey(begin, split)).keySet()) {
                         // Collect all rules containing B as a child (left/right).
-                        List<Grammar.BinaryRule> rules = grammar.getBinaryRulesByLeftChild(B);
+                        List<Grammar.BinaryRule> rules = new ArrayList<Grammar.BinaryRule>();
+                        rules.addAll(grammar.getBinaryRulesByLeftChild(B));
                         rules.addAll(grammar.getBinaryRulesByRightChild(B));
                         // Iterate all rules (containing B), do things if C is also a child
                         // of the rule. That is, A->BC or A->CB.
