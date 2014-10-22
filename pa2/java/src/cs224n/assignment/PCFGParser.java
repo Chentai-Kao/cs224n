@@ -138,6 +138,9 @@ public class PCFGParser implements Parser {
                 maxA = A;
             }
         }
+        if (maxA == null) {
+            System.out.println("------------- A null ----------------" + sentence);
+        }
         Tree<String> tree = buildTree(0, numWords, maxA, sentence);
         return TreeAnnotations.unAnnotateTree(
                 new Tree<String>("ROOT", Collections.singletonList(tree)));
