@@ -187,6 +187,7 @@ public class PCFGParser implements Parser {
     private void setScoreToData(Integer begin_idx, Integer end_idx, String A, double score, Integer split, String B, String C) {
         String key = getIndexKey(begin_idx, end_idx);
         data.get(key).put(A, createScoreAndBackPair(score, split, B, C));
+        System.out.println("--------- setScoreToData() ----" + key + ":" + score);
     }
     
     private Triplet<Integer, String, String> getBackPointerFromData(
