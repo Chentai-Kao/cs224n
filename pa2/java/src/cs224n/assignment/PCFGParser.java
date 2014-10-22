@@ -54,23 +54,19 @@ public class PCFGParser implements Parser {
             }
         }
         // Leaf layer of the matrix.
-        System.out.println("------------ leaf layer ----------");
         for (int i = 0; i < numWords; ++i) {
             String word = sentence.get(i);
             // The set of unaries to fix later.
             Set<String> unariesToFix = new HashSet<String>();
             // Build leaf layer.
-            System.out.println("------------ build leaf layer ----------" + word);
             for (String A : lexicon.getAllTags()) {
                 double score = lexicon.scoreTagging(word, A);
-                System.out.println("------------ rule of word ----------" + A + "->" + word + ", score:" + score);
                 if (score > 0.0) {
                     setScoreToData(i, i + 1, A, score, null, null, null);
                     unariesToFix.add(A); // collect the unaries to fix.
                 }
             }
             // Handle unaries.
-            System.out.println("------------ handle unaries ----------");
             while (!unariesToFix.isEmpty()) {
                 Set<String> newFix = new HashSet<String>();
                 for (String B : unariesToFix) {
@@ -87,14 +83,12 @@ public class PCFGParser implements Parser {
             }
         }
         // Fill all remaining cells of the matrix.
-        System.out.println("------------ remaining cells ----------");
         for (int span = 2; span <= numWords; ++span) {
             for (int begin = 0; begin <= numWords - span; ++begin) {
                 int end = begin + span;
                 // The set of non-terminals (will be updated later).
                 Set<String> unariesToFix = new HashSet<String>();
                 // Binary rules.
-                System.out.println("------------ binary rules ----------");
                 for (int split = begin + 1; split <= end - 1; ++split) {
                     for (String B : data.get(getIndexKey(begin, split)).keySet()) {
                         // Collect all rules containing B as a child (left/right).
@@ -119,7 +113,6 @@ public class PCFGParser implements Parser {
                         }
                     }
                 }
-                System.out.println("------------ handle unaries ----------");
                 // Handle unaries.
                 while (!unariesToFix.isEmpty()) {
                     Set<String> newFix = new HashSet<String>();
@@ -141,17 +134,6 @@ public class PCFGParser implements Parser {
         String key = getIndexKey(0, numWords);
         String maxA = null;
         Double maxValue = -Double.MAX_VALUE;
-        for (int i = 0; i < numWords; ++i) {
-            for (int j = i + 1; j <= numWords; ++j) {
-                String k = getIndexKey(i, j);
-                System.out.println("------");
-                System.out.println(k);
-                System.out.println(data.get(k).keySet().toString());
-            }
-        }
-        //System.out.println("----------- find max ---------------");
-        //System.out.println(key);
-        //System.out.println(data.get(key).keySet().toString());
         for (String A : data.get(key).keySet()) {
             Double score = getScoreFromData(0, numWords, A);
             if (score.compareTo(maxValue) > 0) {
@@ -191,7 +173,6 @@ public class PCFGParser implements Parser {
     private void setScoreToData(Integer begin_idx, Integer end_idx, String A, double score, Integer split, String B, String C) {
         String key = getIndexKey(begin_idx, end_idx);
         data.get(key).put(A, createScoreAndBackPair(score, split, B, C));
-        System.out.println("--------- setScoreToData() ----" + key + ":" + score);
     }
     
     private Triplet<Integer, String, String> getBackPointerFromData(
@@ -204,10 +185,6 @@ public class PCFGParser implements Parser {
     }
     
     private Tree<String> buildTree(Integer begin_idx, Integer end_idx, String A, List<String> sentence) {
-        if (A == null) {
-            System.out.println("-------------- A == null ----------------");
-            System.out.println(getIndexKey(begin_idx, end_idx));
-        }
         Tree<String> tree = new Tree<String>(A);
         List<Tree<String>> children = new ArrayList<Tree<String>>();
         Triplet<Integer, String, String> back = getBackPointerFromData(begin_idx, end_idx, A);
