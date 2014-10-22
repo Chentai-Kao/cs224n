@@ -22,10 +22,10 @@ public class PCFGParser implements Parser {
     // }
     // Example (in a cell(i, j)): A -> BC (score: 0.5)
     //                            "(i, j)": { A: (0.5, Triple(split, B, C)) }
-    private HashMap<String,
-                    HashMap<String,
-                                   Pair<Double,
-                                   Triplet<Integer, String, String>>>> data;
+    private IdentityHashMap<String,
+    IdentityHashMap<String,
+    Pair<Double,
+    Triplet<Integer, String, String>>>> data;
     private Interner<String> interner;
 
     public void train(List<Tree<String>> trainTrees) {
@@ -38,8 +38,8 @@ public class PCFGParser implements Parser {
         }
         lexicon = new Lexicon(binarizedTrees);
         grammar = new Grammar(binarizedTrees);
-        data = new HashMap<String,
-                HashMap<String,
+        data = new IdentityHashMap<String,
+                IdentityHashMap<String,
                 Pair<Double, Triplet<Integer, String, String>>>>();
         interner = new Interner<String>();
     }
@@ -52,7 +52,7 @@ public class PCFGParser implements Parser {
         for (int i = 0; i < numWords + 1; ++i) {
             for (int j = 0; j < numWords + 1; ++j) {
                 data.put(getIndexKey(i, j),
-                        new HashMap<String,
+                        new IdentityHashMap<String,
                         Pair<Double, Triplet<Integer, String, String>>>());
             }
         }
@@ -168,6 +168,7 @@ public class PCFGParser implements Parser {
 
     private Double getScoreFromData(Integer begin_idx, Integer end_idx, String A) {
         String key = getIndexKey(begin_idx, end_idx);
+        A = interner.intern(A);
         if (!data.get(key).containsKey(A)) {
             return 0.0;
         }
@@ -176,18 +177,20 @@ public class PCFGParser implements Parser {
 
     private void setScoreToData(Integer begin_idx, Integer end_idx, String A, double score, Integer split, String B, String C) {
         String key = getIndexKey(begin_idx, end_idx);
+        A = interner.intern(A);
         data.get(key).put(A, createScoreAndBackPair(score, split, B, C));
     }
-    
+
     private Triplet<Integer, String, String> getBackPointerFromData(
             Integer begin_idx, Integer end_idx, String A) {
         String key = getIndexKey(begin_idx, end_idx);
+        A = interner.intern(A);
         if (!data.get(key).containsKey(A)) {
             return null;
         }
         return data.get(key).get(A).getSecond();
     }
-    
+
     private Tree<String> buildTree(Integer begin_idx, Integer end_idx, String A, List<String> sentence) {
         Tree<String> tree = new Tree<String>(A);
         List<Tree<String>> children = new ArrayList<Tree<String>>();
