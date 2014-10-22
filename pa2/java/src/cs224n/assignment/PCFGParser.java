@@ -104,12 +104,12 @@ public class PCFGParser implements Parser {
                                             getScoreFromData(split, end, C) *
                                             r.getScore();
                                     String A = r.getParent();
-                                    System.out.println("(" + begin + "," + split + "," + end + "): (A, B, C) = (" +
-                                            getScoreFromData(begin, end, A) + "," +
-                                            getScoreFromData(begin, end, B) + "," +
-                                            getScoreFromData(begin, end, C) + "), A->BC: " +
-                                            r.getScore()
-                                            );
+                                    //System.out.println("(" + begin + "," + split + "," + end + "): (A, B, C) = (" +
+                                    //        getScoreFromData(begin, end, A) + "," +
+                                    //        getScoreFromData(begin, end, B) + "," +
+                                    //        getScoreFromData(begin, end, C) + "), A->BC: " +
+                                    //        r.getScore()
+                                    //        );
                                     if (prob > getScoreFromData(begin, end, A)) {
                                         setScoreToData(begin, end, A, prob, split, B, C);
                                         unariesToFix.add(A);
