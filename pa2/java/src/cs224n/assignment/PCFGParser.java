@@ -41,6 +41,7 @@ public class PCFGParser implements Parser {
         data = new HashMap<String,
                 HashMap<String,
                 Pair<Double, Triplet<Integer, String, String>>>>();
+        interner = new Interner<String>();
     }
 
     public Tree<String> getBestParse(List<String> sentence) {
