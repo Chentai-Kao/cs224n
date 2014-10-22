@@ -44,11 +44,10 @@ public class PCFGParser implements Parser {
     public Tree<String> getBestParse(List<String> sentence) {
         // TODO: implement this method
         int numWords = sentence.size();
+        // Initialize the data.
         data = new IdentityHashMap<String,
                 IdentityHashMap<String,
                 Pair<Double, Triplet<Integer, String, String>>>>();
-
-        // Initialize the data.
         for (int i = 0; i < numWords + 1; ++i) {
             for (int j = 0; j < numWords + 1; ++j) {
                 data.put(getIndexKey(i, j),
@@ -94,22 +93,18 @@ public class PCFGParser implements Parser {
                 // Binary rules.
                 for (int split = begin + 1; split <= end - 1; ++split) {
                     for (String B : data.get(getIndexKey(begin, split)).keySet()) {
-                        // Collect all rules containing B as a child (left/right).
-                        List<Grammar.BinaryRule> rules = new ArrayList<Grammar.BinaryRule>();
-                        rules.addAll(grammar.getBinaryRulesByLeftChild(B));
-                        // Iterate all rules (containing B), do things if C is also a child
-                        // of the rule. That is, A->BC or A->CB.
-                        for (Grammar.BinaryRule r : rules) {
-                            for (String C : data.get(getIndexKey(split, end)).keySet()) {
-                                if (r.getRightChild().equals(C)) {
-                                    double prob = getScoreFromData(begin, split, B) *
-                                            getScoreFromData(split, end, C) *
-                                            r.getScore();
-                                    String A = r.getParent();
-                                    if (prob > getScoreFromData(begin, end, A)) {
-                                        setScoreToData(begin, end, A, prob, split, B, C);
-                                        unariesToFix.add(A);
-                                    }
+                        // Iterate all rules (with left child B), do things if C
+                        // is right child of the rule. That is, A->BC.
+                        for (Grammar.BinaryRule r : grammar.getBinaryRulesByLeftChild(B)) {
+                            String C = interner.intern(r.getRightChild());
+                            if (data.get(getIndexKey(split, end)).containsKey(C)) {
+                                double prob = getScoreFromData(begin, split, B) *
+                                              getScoreFromData(split, end, C) *
+                                              r.getScore();
+                                String A = r.getParent();
+                                if (prob > getScoreFromData(begin, end, A)) {
+                                    setScoreToData(begin, end, A, prob, split, B, C);
+                                    unariesToFix.add(A);
                                 }
                             }
                         }
