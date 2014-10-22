@@ -139,10 +139,10 @@ public class PCFGParser implements Parser {
         Double maxValue = -Double.MAX_VALUE;
         for (int i = 0; i < numWords; ++i) {
             for (int j = i + 1; j <= numWords; ++j) {
-                String k = getIndexKey(0, numWords);
-                //System.out.println("------");
-                //System.out.println(k);
-                //System.out.println(data.get(k).keySet().toString());
+                String k = getIndexKey(i, j);
+                System.out.println("------");
+                System.out.println(k);
+                System.out.println(data.get(k).keySet().toString());
             }
         }
         //System.out.println("----------- find max ---------------");
