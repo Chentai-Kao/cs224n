@@ -38,15 +38,15 @@ public class PCFGParser implements Parser {
         }
         lexicon = new Lexicon(binarizedTrees);
         grammar = new Grammar(binarizedTrees);
-        data = new IdentityHashMap<String,
-                IdentityHashMap<String,
-                Pair<Double, Triplet<Integer, String, String>>>>();
         interner = new Interner<String>();
     }
 
     public Tree<String> getBestParse(List<String> sentence) {
         // TODO: implement this method
         int numWords = sentence.size();
+        data = new IdentityHashMap<String,
+                IdentityHashMap<String,
+                Pair<Double, Triplet<Integer, String, String>>>>();
 
         // Initialize the data.
         for (int i = 0; i < numWords + 1; ++i) {
@@ -149,8 +149,7 @@ public class PCFGParser implements Parser {
     }
 
     private String getIndexKey(Integer i, Integer j) {
-        String key = "(" + i.toString() + ", " + j.toString() + ")";
-        return interner.intern(key);
+        return interner.intern("" + i + "_" + j);
     }
 
     private Pair<Double, Triplet<Integer, String, String>> createScoreAndBackPair(
