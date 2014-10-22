@@ -138,7 +138,8 @@ public class PCFGParser implements Parser {
                 maxA = A;
             }
         }
-        return buildTree(0, numWords, maxA, sentence);
+        Tree<String> tree = buildTree(0, numWords, maxA, sentence);
+        return new Tree<String>("ROOT", Collections.singletonList(tree));
     }
 
     private String getIndexKey(Integer i, Integer j) {
