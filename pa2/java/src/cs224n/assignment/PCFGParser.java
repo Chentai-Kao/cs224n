@@ -144,7 +144,7 @@ public class PCFGParser implements Parser {
     }
 
     private String getIndexKey(Integer i, Integer j) {
-        return interner.intern("" + i + "_" + j);
+        return interner.intern(i + "_" + j);
     }
 
     private Pair<Double, Triplet<Integer, String, String>> createScoreAndBackPair(

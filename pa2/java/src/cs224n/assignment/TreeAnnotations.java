@@ -27,7 +27,8 @@ public class TreeAnnotations {
 		// order vertical markov process
 
 		Tree<String> annotatedTree = binarizeTree(unAnnotatedTree);
-		return markovizeTree(annotatedTree, null);
+		markovizeTree(annotatedTree, null);
+		return annotatedTree;
 	}
 
 	private static Tree<String> binarizeTree(Tree<String> tree) {
@@ -83,17 +84,16 @@ public class TreeAnnotations {
 		return unMarkovizedTree;
 	}
 	
-	private static Tree<String> markovizeTree(Tree<String> tree, String parent) {
+	private static void markovizeTree(Tree<String> tree, String parent) {
         String label = tree.getLabel();
-        if (tree.isLeaf())
-            return new Tree<String>(label);
-        List<Tree<String>> children = new ArrayList<Tree<String>>();
+        if (tree.isLeaf()) {
+            return;
+        }
         for (Tree<String> child : tree.getChildren()) {
-            children.add(markovizeTree(child, label));
+            markovizeTree(child, label);
         }
         if (parent != null) {
-            label += "^" + parent;
+            tree.setLabel(label + "^" + parent);
         }
-        return new Tree<String>(label, children);
     }
 }
