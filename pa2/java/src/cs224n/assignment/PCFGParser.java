@@ -3,6 +3,7 @@ package cs224n.assignment;
 import cs224n.ling.Tree;
 import cs224n.ling.Trees;
 import cs224n.util.Counter;
+import cs224n.util.Interner;
 import cs224n.util.Pair;
 import cs224n.util.Triplet;
 
@@ -25,6 +26,7 @@ public class PCFGParser implements Parser {
                     HashMap<String,
                                    Pair<Double,
                                    Triplet<Integer, String, String>>>> data;
+    private Interner<String> interner;
 
     public void train(List<Tree<String>> trainTrees) {
         // TODO: before you generate your grammar, the training trees
@@ -146,7 +148,8 @@ public class PCFGParser implements Parser {
     }
 
     private String getIndexKey(Integer i, Integer j) {
-        return "(" + i.toString() + ", " + j.toString() + ")";
+        String key = "(" + i.toString() + ", " + j.toString() + ")";
+        return interner.intern(key);
     }
 
     private Pair<Double, Triplet<Integer, String, String>> createScoreAndBackPair(
