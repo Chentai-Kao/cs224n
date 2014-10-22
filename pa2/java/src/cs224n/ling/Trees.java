@@ -17,11 +17,7 @@ import java.util.*;
 public class Trees {
 
 	public static interface TreeTransformer<E> {
-		public static interface TreeTransformer<E> {
-        	Tree<E> transformTree(Tree<E> tree);
-        }
-
-        Tree<E> transformTree(Tree<E> tree);
+		Tree<E> transformTree(Tree<E> tree);
 	}
 
 	public static class FunctionNodeStripper implements TreeTransformer<String> {
