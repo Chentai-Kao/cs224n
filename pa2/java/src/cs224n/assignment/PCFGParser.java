@@ -62,7 +62,6 @@ public class PCFGParser implements Parser {
             // Build leaf layer.
             System.out.println("------------ build leaf layer ----------" + word);
             for (String A : lexicon.getAllTags()) {
-                String A = rule.getParent();
                 double score = lexicon.scoreTagging(word, A);
                 System.out.println("------------ rule of word ----------" + A + "->" + word + ", score:" + score);
                 if (score > 0.0) {
