@@ -142,7 +142,8 @@ public class PCFGParser implements Parser {
             }
         }
         Tree<String> tree = buildTree(0, numWords, maxA, sentence);
-        return new Tree<String>("ROOT", Collections.singletonList(tree));
+        return TreeAnnotations.unAnnotateTree(
+                new Tree<String>("ROOT", Collections.singletonList(tree)));
     }
 
     private String getIndexKey(Integer i, Integer j) {
