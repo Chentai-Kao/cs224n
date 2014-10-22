@@ -1,6 +1,7 @@
 package cs224n.assignment;
 
 import cs224n.ling.Tree;
+import cs224n.ling.Trees;
 import cs224n.util.Counter;
 import cs224n.util.Pair;
 import cs224n.util.Triplet;
@@ -29,7 +30,11 @@ public class PCFGParser implements Parser {
         // TODO: before you generate your grammar, the training trees
         // need to be binarized so that rules are at most binary
         for (Tree<String> tree : trainTrees) {
+            System.out.println("----------------------");
+            Trees.PennTreeRenderer.render(tree);
+            System.out.println("--------");
             tree = TreeAnnotations.annotateTree(tree);
+            Trees.PennTreeRenderer.render(tree);
         }
         lexicon = new Lexicon(trainTrees);
         grammar = new Grammar(trainTrees);
