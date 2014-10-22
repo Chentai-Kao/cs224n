@@ -60,7 +60,7 @@ public class PCFGParser implements Parser {
             // The set of unaries to fix later.
             Set<String> unariesToFix = new HashSet<String>();
             // Build leaf layer.
-            System.out.println("------------ build leaf layer ----------");
+            System.out.println("------------ build leaf layer ----------" + word);
             for (Grammar.UnaryRule rule : grammar.getUnaryRulesByChild(word)) {
                 String A = rule.getParent();
                 System.out.println("------------ rule of word ----------" + A + "->" + word);
