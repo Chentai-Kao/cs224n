@@ -61,11 +61,14 @@ public class PCFGParser implements Parser {
             Set<String> unariesToFix = new HashSet<String>();
             // Build leaf layer.
             System.out.println("------------ build leaf layer ----------" + word);
-            for (Grammar.UnaryRule rule : grammar.getUnaryRulesByChild(word)) {
+            for (String A : lexicon.getAllTags()) {
                 String A = rule.getParent();
-                System.out.println("------------ rule of word ----------" + A + "->" + word);
-                setScoreToData(i, i + 1, A, rule.getScore(), null, null, null);
-                unariesToFix.add(A); // collect the unaries to fix.
+                double score = lexicon.scoreTagging(word, A);
+                System.out.println("------------ rule of word ----------" + A + "->" + word + ", score:" + score);
+                if (score > 0.0) {
+                    setScoreToData(i, i + 1, A, rule.getScore(), null, null, null);
+                    unariesToFix.add(A); // collect the unaries to fix.
+                }
             }
             // Handle unaries.
             System.out.println("------------ handle unaries ----------");
