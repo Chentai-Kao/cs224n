@@ -31,10 +31,10 @@ public class PCFGParser implements Parser {
         // need to be binarized so that rules are at most binary
         for (Tree<String> tree : trainTrees) {
             System.out.println("----------------------");
-            Trees.PennTreeRenderer.render(tree);
+            System.out.print(Trees.PennTreeRenderer.render(tree));
             System.out.println("--------");
             tree = TreeAnnotations.annotateTree(tree);
-            Trees.PennTreeRenderer.render(tree);
+            System.out.print(Trees.PennTreeRenderer.render(tree));
         }
         lexicon = new Lexicon(trainTrees);
         grammar = new Grammar(trainTrees);
