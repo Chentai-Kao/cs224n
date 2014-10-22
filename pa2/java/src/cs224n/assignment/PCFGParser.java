@@ -66,7 +66,7 @@ public class PCFGParser implements Parser {
                 double score = lexicon.scoreTagging(word, A);
                 System.out.println("------------ rule of word ----------" + A + "->" + word + ", score:" + score);
                 if (score > 0.0) {
-                    setScoreToData(i, i + 1, A, rule.getScore(), null, null, null);
+                    setScoreToData(i, i + 1, A, score, null, null, null);
                     unariesToFix.add(A); // collect the unaries to fix.
                 }
             }
