@@ -182,6 +182,10 @@ public class PCFGParser implements Parser {
     }
     
     private Tree<String> buildTree(Integer begin_idx, Integer end_idx, String A, List<String> sentence) {
+        if (A == null) {
+            System.out.println("-------------- A == null ----------------");
+            System.out.println(getIndexKey(begin_idx, end_idx));
+        }
         Tree<String> tree = new Tree<String>(A);
         List<Tree<String>> children = new ArrayList<Tree<String>>();
         Triplet<Integer, String, String> back = getBackPointerFromData(begin_idx, end_idx, A);
