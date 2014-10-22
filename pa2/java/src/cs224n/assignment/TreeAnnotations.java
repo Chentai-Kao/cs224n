@@ -26,8 +26,8 @@ public class TreeAnnotations {
 		// TODO : mark nodes with the label of their parent nodes, giving a second
 		// order vertical markov process
 
-		return binarizeTree(unAnnotatedTree);
-
+		Tree<String> annotatedTree = binarizeTree(unAnnotatedTree);
+		return markovizeTree(annotatedTree, null);
 	}
 
 	private static Tree<String> binarizeTree(Tree<String> tree) {
@@ -60,7 +60,7 @@ public class TreeAnnotations {
 			children.add(rightTree);
 		}
 		return new Tree<String>(intermediateLabel, children);
-	} 
+	}
 
 	public static Tree<String> unAnnotateTree(Tree<String> annotatedTree) {
 
@@ -82,4 +82,18 @@ public class TreeAnnotations {
         (new Trees.MarkovizationAnnotationStripper()).transformTree(unAnnotatedTree);
 		return unMarkovizedTree;
 	}
+	
+	private static Tree<String> markovizeTree(Tree<String> tree, String parent) {
+        String label = tree.getLabel();
+        if (tree.isLeaf())
+            return new Tree<String>(label);
+        List<Tree<String>> children = new ArrayList<Tree<String>>();
+        for (Tree<String> child : tree.getChildren()) {
+            children.add(markovizeTree(child, label));
+        }
+        if (parent != null) {
+            label += "^" + parent;
+        }
+        return new Tree<String>(label, children);
+    }
 }
