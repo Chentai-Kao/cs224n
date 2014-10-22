@@ -21,14 +21,14 @@ public class PCFGParser implements Parser {
     // Example (in a cell(i, j)): A -> BC (score: 0.5)
     //                            "(i, j)": { A: (0.5, Triple(split, B, C)) }
     private HashMap<String,
-    HashMap<String,
-    Pair<Double,
-    Triplet<Integer, String, String>>>> data;
+                    HashMap<String,
+                                   Pair<Double,
+                                   Triplet<Integer, String, String>>>> data;
 
     public void train(List<Tree<String>> trainTrees) {
         // TODO: before you generate your grammar, the training trees
         // need to be binarized so that rules are at most binary
-        for (Tree<String>tree : trainTrees) {
+        for (Tree<String> tree : trainTrees) {
             tree = TreeAnnotations.annotateTree(tree);
         }
         lexicon = new Lexicon(trainTrees);
