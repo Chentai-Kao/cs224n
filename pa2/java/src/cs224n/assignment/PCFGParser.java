@@ -44,6 +44,7 @@ public class PCFGParser implements Parser {
     public Tree<String> getBestParse(List<String> sentence) {
         // TODO: implement this method
         int numWords = sentence.size();
+        System.out.println("========== getBestParse(): numWords=" + numWords);
         // Initialize the data.
         data = new IdentityHashMap<String,
                 IdentityHashMap<String,
@@ -142,6 +143,9 @@ public class PCFGParser implements Parser {
         }
         if (maxA == null) {
             System.out.println("------------- A null ----------------" + sentence);
+        }
+        if (maxA == null) {
+            return new BaselineParser().getBestParse(sentence);
         }
         Tree<String> tree = buildTree(0, numWords, maxA, sentence);
         return TreeAnnotations.unAnnotateTree(
