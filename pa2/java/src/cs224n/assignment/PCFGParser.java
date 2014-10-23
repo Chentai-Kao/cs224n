@@ -27,7 +27,6 @@ public class PCFGParser implements Parser {
     Pair<Double,
     Triplet<Integer, String, String>>>> data;
     private Interner<String> interner;
-    private BaselineParser baselineParser;
 
     public void train(List<Tree<String>> trainTrees) {
         // TODO: before you generate your grammar, the training trees
@@ -40,8 +39,6 @@ public class PCFGParser implements Parser {
         lexicon = new Lexicon(binarizedTrees);
         grammar = new Grammar(binarizedTrees);
         interner = new Interner<String>();
-        baselineParser = new BaselineParser();
-        baselineParser.train(binarizedTrees);
     }
 
     public Tree<String> getBestParse(List<String> sentence) {
