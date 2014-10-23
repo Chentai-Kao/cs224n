@@ -27,6 +27,7 @@ public class PCFGParser implements Parser {
     Pair<Double,
     Triplet<Integer, String, String>>>> data;
     private Interner<String> interner;
+    private BaselineParser baselineParser;
 
     public void train(List<Tree<String>> trainTrees) {
         // TODO: before you generate your grammar, the training trees
@@ -39,12 +40,13 @@ public class PCFGParser implements Parser {
         lexicon = new Lexicon(binarizedTrees);
         grammar = new Grammar(binarizedTrees);
         interner = new Interner<String>();
+        baselineParser = new BaselineParser();
+        baselineParser.train(binarizedTrees);
     }
 
     public Tree<String> getBestParse(List<String> sentence) {
         // TODO: implement this method
         int numWords = sentence.size();
-        System.out.println("========== getBestParse(): numWords=" + numWords);
         // Initialize the data.
         data = new IdentityHashMap<String,
                 IdentityHashMap<String,
@@ -132,10 +134,8 @@ public class PCFGParser implements Parser {
         String key = getIndexKey(0, numWords);
         String maxA = null;
         Double maxValue = -Double.MAX_VALUE;
-        System.out.println("========== finding maxA ==========");
         for (String A : data.get(key).keySet()) {
             double score = getScoreFromData(0, numWords, A);
-            System.out.println(A + ": score = " + score + "(maxValue, maxA)=(" + maxValue + "," + maxA + ")");
             if (score > maxValue) {
                 maxValue = score;
                 maxA = A;
@@ -145,7 +145,7 @@ public class PCFGParser implements Parser {
             System.out.println("------------- A null ----------------" + sentence);
         }
         if (maxA == null) {
-            return new BaselineParser().getBestParse(sentence);
+            return baselineParser.getBestParse(sentence);
         }
         Tree<String> tree = buildTree(0, numWords, maxA, sentence);
         return TreeAnnotations.unAnnotateTree(
