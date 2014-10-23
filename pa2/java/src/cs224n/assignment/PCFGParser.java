@@ -131,29 +131,6 @@ public class PCFGParser implements Parser {
             }
         }
         // Build tree. Find the maximum in the root cell, then build tree.
-        String key = getIndexKey(0, numWords);
-        /*
-        String maxA = null;
-        Double maxValue = -Double.MAX_VALUE;
-        for (String A : data.get(key).keySet()) {
-            double score = getScoreFromData(0, numWords, A);
-            if (score > maxValue) {
-                maxValue = score;
-                maxA = A;
-            }
-        }
-        if (maxA == null) {
-            System.out.println("------------- A null ----------------" + sentence);
-        }
-        if (maxA == null) {
-            return TreeAnnotations.unAnnotateTree(baselineParser.getBestParse(sentence));
-        }
-        
-        Tree<String> tree = buildTree(0, numWords, maxA, sentence);
-        
-        return TreeAnnotations.unAnnotateTree(
-                new Tree<String>("ROOT", Collections.singletonList(tree)));
-        */
         Tree<String> tree = buildTree(0, numWords, "ROOT", sentence);
         return TreeAnnotations.unAnnotateTree(tree);
     }
