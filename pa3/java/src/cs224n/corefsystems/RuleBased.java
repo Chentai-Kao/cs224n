@@ -30,29 +30,16 @@ public class RuleBased implements CoreferenceSystem {
         for (Mention m : doc.getMentions()) {
             clusters.put(m, m.markSingleton());
         }
-        // A hash of set: entity => [coreferent mentions of this entity]
-        // Initialized as m.entity => [m], each mention has its own entity.
-//        Map<Entity, Set<Mention>> entityMentionMap = new HashMap<Entity, Set<Mention>>();
-//        for (Mention m : doc.getMentions()) {
-//            Entity entity = clusters.get(m).entity;
-//            Set<Mention> mentionSet = new HashSet<Mention>();
-//            mentionSet.add(m);
-//            entityMentionMap.put(entity, mentionSet);
-//        }
         // Create all combination pair of mentions. Easy to loop through.
-        Set<Mention> seenMentions = new HashSet<Mention>();
         List<Pair<Mention, Mention>> mentionPairs = new ArrayList<Pair<Mention, Mention>>();
-        for(Mention mi : doc.getMentions()) {
-            seenMentions.add(mi);
-            for(Mention mj : doc.getMentions()) {
-                if (!seenMentions.contains(mj)) {
-                    mentionPairs.add(new Pair<Mention, Mention>(mi, mj));
-                }
+        for (Mention a : doc.getMentions()) {
+            for (Mention b : doc.getMentions()) {
+                mentionPairs.add(new Pair<Mention, Mention>(a, b));
             }
         }
         // Multi-pass sieve (NLP 10')
         pass1(mentionPairs, clusters);
-
+        pass2(mentionPairs, clusters);
         // Create and return the mentions
         List<ClusteredMention> mentions = new ArrayList<ClusteredMention>();
         for (ClusteredMention cluster : clusters.values()) {
@@ -60,20 +47,46 @@ public class RuleBased implements CoreferenceSystem {
         }
         return mentions;
     }
-    
-    // Move src to the same bin as dst's entity, meaning that they're coreferent.   
-    private void updateCoreferent(Map <Mention, ClusteredMention> clusters, Mention dst, Mention src) {
-        src.removeCoreference();
-        clusters.put(src, src.markCoreferent(clusters.get(dst)));
+
+    // Check whether two mentions are already marked coreferent.
+    private boolean isCoreferent(Map <Mention, ClusteredMention> clusters,
+            Mention a, Mention b) {
+        return clusters.get(a).entity == clusters.get(b).entity;
+    }
+
+    // Mark a and b as coreferent.
+    private void updateCoreferent(Map <Mention, ClusteredMention> clusters,
+            Mention a, Mention b) {
+        if (isCoreferent(clusters, a, b)) {
+            return;
+        }
+        a.removeCoreference();
+        clusters.put(a, a.markCoreferent(clusters.get(b)));
     }
 
     private void pass1(List<Pair<Mention, Mention>> mentionPairs,
-                       Map <Mention, ClusteredMention> clusters) {
+            Map <Mention, ClusteredMention> clusters) {
         for (Pair<Mention, Mention> mentionPair : mentionPairs) {
-            Mention mi = mentionPair.getFirst();
-            Mention mj = mentionPair.getSecond();
-            if (mi.gloss().equals(mj.gloss())) {
-                updateCoreferent(clusters, mi, mj);
+            Mention a = mentionPair.getFirst();
+            Mention b = mentionPair.getSecond();
+            if (a.gloss().equals(b.gloss())) {
+                updateCoreferent(clusters, a, b);
+            }
+        }
+    }
+
+    private void pass2(List<Pair<Mention, Mention>> mentionPairs,
+            Map <Mention, ClusteredMention> clusters) {
+        for (Pair<Mention, Mention> mentionPair : mentionPairs) {
+            Mention a = mentionPair.getFirst();
+            Mention b = mentionPair.getSecond();
+            if (false || // TODO apposition
+                false || // TODO predicate nominative
+                false || // TODO role appositive
+                false || // TODO relative pronoun
+                false || // TODO acronym
+                false) { // TODO demonym
+                updateCoreferent(clusters, a, b);
             }
         }
     }
