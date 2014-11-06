@@ -109,12 +109,8 @@ public interface Feature {
       public NamedEntityType(String namedEntityType){ super(namedEntityType); }
   }
 
-  public static class OnPrixPhraseLength extends IntIndicator {
-      public OnPrixPhraseLength(int onPrixPhraseLength){ super(onPrixPhraseLength); }
-  }
-  
-  public static class CandidatePhraseLength extends IntIndicator {
-      public CandidatePhraseLength(int candidatePhraseLength){ super(candidatePhraseLength); }
+  public static class LengthDifference extends IntIndicator {
+      public LengthDifference(int lengthDifference){ super(lengthDifference); }
   }
   
   public static class BeginIndexDifference extends IntIndicator {
@@ -123,6 +119,10 @@ public interface Feature {
 
   public static class SameGender extends Indicator {
       public SameGender(boolean sameGender){ super(sameGender); }
+  }
+  
+  public static class SameProperNoun extends Indicator {
+      public SameProperNoun(boolean sameProperNoun){ super(sameProperNoun); }
   }
   
   /*

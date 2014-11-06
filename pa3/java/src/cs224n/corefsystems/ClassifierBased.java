@@ -36,10 +36,10 @@ public class ClassifierBased implements CoreferenceSystem {
       Feature.ExactMatch.class,
       Feature.ContainsPronoun.class,
       Feature.NamedEntityType.class,
-      Feature.OnPrixPhraseLength.class,
-      Feature.CandidatePhraseLength.class,
+      Feature.LengthDifference.class,
       Feature.BeginIndexDifference.class,
       Feature.SameGender.class,
+      Feature.SameProperNoun.class,
 
       //skeleton for how to create a pair feature
       //Pair.make(Feature.IsFeature1.class, Feature.IsFeature2.class),
@@ -72,17 +72,17 @@ public class ClassifierBased implements CoreferenceSystem {
                 Pronoun.isSomePronoun(candidate.gloss()));
       } else if(clazz.equals(Feature.NamedEntityType.class)) {
           return new Feature.NamedEntityType(candidate.gloss());
-      } else if(clazz.equals(Feature.OnPrixPhraseLength.class)) {
-          return new Feature.OnPrixPhraseLength(
-                  onPrix.endIndexExclusive - onPrix.beginIndexInclusive);
-      } else if(clazz.equals(Feature.CandidatePhraseLength.class)) {
-          return new Feature.CandidatePhraseLength(
-                  candidate.endIndexExclusive - candidate.beginIndexInclusive);
+      } else if(clazz.equals(Feature.LengthDifference.class)) {
+          return new Feature.LengthDifference(onPrix.length() - candidate.length());
       } else if(clazz.equals(Feature.BeginIndexDifference.class)) {
           return new Feature.BeginIndexDifference(
                   onPrix.beginIndexInclusive - candidate.beginIndexInclusive);
       } else if(clazz.equals(Feature.SameGender.class)) {
-          return new Feature.SameGender(Name.gender(onPrix.gloss()) == Name.gender(candidate.gloss()));
+          return new Feature.SameGender(
+                  Name.mostLikelyGender(onPrix.gloss()) == Name.mostLikelyGender(candidate.gloss()));
+      } else if(clazz.equals(Feature.SameProperNoun.class)) {
+          return new Feature.SameProperNoun(
+                  Name.mostLikelyGender(onPrix.gloss()) == Name.mostLikelyGender(candidate.gloss()));
       } else {
         throw new IllegalArgumentException("Unregistered feature: " + clazz);
       }
