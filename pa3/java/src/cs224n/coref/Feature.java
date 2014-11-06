@@ -141,6 +141,10 @@ public interface Feature {
       public SameSpeaker(boolean sameSpeaker){ super(sameSpeaker); }
   }
   
+  public static class SameLemmasLength extends Indicator {
+      public SameLemmasLength(boolean sameLemmasLength){ super(sameLemmasLength); }
+  }
+  
   /*
    * TODO: Add values to the indicators here.
    */
