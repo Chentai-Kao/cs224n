@@ -108,6 +108,14 @@ public interface Feature {
   public static class NamedEntityType extends StringIndicator {
       public NamedEntityType(String namedEntityType){ super(namedEntityType); }
   }
+
+  public static class OnPrixPhraseLength extends IntIndicator {
+      public OnPrixPhraseLength(int onPrixPhraseLength){ super(onPrixPhraseLength); }
+  }
+  
+  public static class CandidatePhraseLength extends IntIndicator {
+      public CandidatePhraseLength(int candidatePhraseLength){ super(candidatePhraseLength); }
+  }
   
   /*
    * TODO: Add values to the indicators here.
