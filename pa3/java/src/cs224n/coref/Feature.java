@@ -148,6 +148,14 @@ public interface Feature {
   public static class LemmasIntersectionSize extends IntIndicator {
       public LemmasIntersectionSize(int lemmasIntersectionSize){ super(lemmasIntersectionSize); }
   }
+
+  public static class SameNerTag extends Indicator {
+      public SameNerTag(boolean sameNerTag){ super(sameNerTag); }
+  }
+  
+  public static class SamePosTag extends Indicator {
+      public SamePosTag(boolean samePosTag){ super(samePosTag); }
+  }
   
   /*
    * TODO: Add values to the indicators here.

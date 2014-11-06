@@ -46,6 +46,8 @@ public class ClassifierBased implements CoreferenceSystem {
       Feature.SameSpeaker.class,
       Feature.SameLemmasLength.class,
       Feature.LemmasIntersectionSize.class,
+      Feature.SameNerTag.class,
+      Feature.SamePosTag.class,
 
       //skeleton for how to create a pair feature
       //Pair.make(Feature.IsFeature1.class, Feature.IsFeature2.class),
@@ -103,6 +105,10 @@ public class ClassifierBased implements CoreferenceSystem {
           Set<String> candidateLemmasSet = new HashSet<String>(candidate.sentence.lemmas);
           intersectionSet.retainAll(candidateLemmasSet);
           return new Feature.LemmasIntersectionSize(intersectionSet.size());
+      } else if(clazz.equals(Feature.SameNerTag.class)) {
+          return new Feature.SameNerTag(onPrix.headToken().nerTag() == candidate.headToken().nerTag());
+      } else if(clazz.equals(Feature.SamePosTag.class)) {
+          return new Feature.SamePosTag(onPrix.headToken().posTag() == candidate.headToken().posTag());
       } else {
         throw new IllegalArgumentException("Unregistered feature: " + clazz);
       }
