@@ -55,11 +55,14 @@ public class PCFGParser implements Parser {
                         Pair<Double, Triplet<Integer, String, String>>>());
             }
         }
+        // Variables used when handling unary rules.
+        Set<String> unariesToFix = new HashSet<String>();
+        Set<String> newFix = new HashSet<String>();
         // Leaf layer of the matrix.
         for (int i = 0; i < numWords; ++i) {
             String word = sentence.get(i);
             // The set of unaries to fix later.
-            Set<String> unariesToFix = new HashSet<String>();
+            unariesToFix.clear();
             // Build leaf layer.
             for (String A : lexicon.getAllTags()) {
                 double score = lexicon.scoreTagging(word, A);
@@ -70,7 +73,7 @@ public class PCFGParser implements Parser {
             }
             // Handle unaries.
             while (!unariesToFix.isEmpty()) {
-                Set<String> newFix = new HashSet<String>();
+                newFix.clear();
                 for (String B : unariesToFix) {
                     for (Grammar.UnaryRule ruleAB : grammar.getUnaryRulesByChild(B)) {
                         String A = ruleAB.getParent();
@@ -89,7 +92,7 @@ public class PCFGParser implements Parser {
             for (int begin = 0; begin <= numWords - span; ++begin) {
                 int end = begin + span;
                 // The set of non-terminals (will be updated later).
-                Set<String> unariesToFix = new HashSet<String>();
+                unariesToFix.clear();
                 // Binary rules.
                 for (int split = begin + 1; split <= end - 1; ++split) {
                     for (String B : data.get(getIndexKey(begin, split)).keySet()) {
@@ -112,7 +115,7 @@ public class PCFGParser implements Parser {
                 }
                 // Handle unaries.
                 while (!unariesToFix.isEmpty()) {
-                    Set<String> newFix = new HashSet<String>();
+                    newFix.clear();
                     for (String B : unariesToFix) {
                         for (Grammar.UnaryRule ruleAB : grammar.getUnaryRulesByChild(B)) {
                             String A = ruleAB.getParent();
