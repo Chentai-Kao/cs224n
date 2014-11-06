@@ -101,6 +101,10 @@ public interface Feature {
     public ExactMatch(boolean exactMatch){ super(exactMatch); }
   }
   
+  public static class ContainsPronoun extends Indicator {
+      public ContainsPronoun(boolean containsPronoun){ super(containsPronoun); }
+    }
+  
   /*
    * TODO: Add values to the indicators here.
    */

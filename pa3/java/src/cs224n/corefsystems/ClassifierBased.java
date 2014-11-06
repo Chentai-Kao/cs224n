@@ -34,6 +34,7 @@ public class ClassifierBased implements CoreferenceSystem {
        */
 
       Feature.ExactMatch.class,
+      Feature.ContainsPronoun.class,
 
       //skeleton for how to create a pair feature
       //Pair.make(Feature.IsFeature1.class, Feature.IsFeature2.class),
@@ -60,10 +61,10 @@ public class ClassifierBased implements CoreferenceSystem {
       if(clazz.equals(Feature.ExactMatch.class)){
         //(exact string match)
         return new Feature.ExactMatch(onPrix.gloss().equals(candidate.gloss()));
-//      } else if(clazz.equals(Feature.NewFeature.class) {
-        /*
-         * TODO: Add features to return for specific classes. Implement calculating values of features here.
-         */
+      } else if(clazz.equals(Feature.ContainsPronoun.class)) {
+        return new Feature.ContainsPronoun(
+                Pronoun.isSomePronoun(onPrix.gloss()) ||
+                Pronoun.isSomePronoun(candidate.gloss()));
       }
       else {
         throw new IllegalArgumentException("Unregistered feature: " + clazz);
