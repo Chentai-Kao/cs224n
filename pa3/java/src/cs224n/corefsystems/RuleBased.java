@@ -69,6 +69,9 @@ public class RuleBased implements CoreferenceSystem {
         for (Pair<Mention, Mention> mentionPair : mentionPairs) {
             Mention a = mentionPair.getFirst();
             Mention b = mentionPair.getSecond();
+            if (isCoreferent(clusters, a, b)) {
+                continue;
+            }
             if (a.gloss().equals(b.gloss())) {
                 updateCoreferent(clusters, a, b);
             }
@@ -80,6 +83,9 @@ public class RuleBased implements CoreferenceSystem {
         for (Pair<Mention, Mention> mentionPair : mentionPairs) {
             Mention a = mentionPair.getFirst();
             Mention b = mentionPair.getSecond();
+            if (isCoreferent(clusters, a, b)) {
+                continue;
+            }
             if (false || // TODO apposition
                 false || // TODO predicate nominative
                 false || // TODO role appositive
