@@ -81,8 +81,7 @@ public class ClassifierBased implements CoreferenceSystem {
           return new Feature.SameGender(
                   Name.mostLikelyGender(onPrix.gloss()) == Name.mostLikelyGender(candidate.gloss()));
       } else if(clazz.equals(Feature.SameProperNoun.class)) {
-          return new Feature.SameProperNoun(
-                  Name.mostLikelyGender(onPrix.gloss()) == Name.mostLikelyGender(candidate.gloss()));
+          return new Feature.SameProperNoun(onPrix.headToken().isProperNoun() == candidate.headToken().isProperNoun());
       } else {
         throw new IllegalArgumentException("Unregistered feature: " + clazz);
       }
