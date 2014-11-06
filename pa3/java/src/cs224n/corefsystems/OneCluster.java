@@ -30,9 +30,10 @@ public class OneCluster implements CoreferenceSystem {
         for(Mention m : doc.getMentions()){
             if (newCluster == null) {
                 newCluster = m.markSingleton();
+                mentions.add(newCluster);
+            } else {
+                mentions.add(m.markCoreferent(newCluster));
             }
-            mentions.add(newCluster);
-            m.markCoreferent(newCluster);
         }
         //(return the mentions)
         return mentions;
