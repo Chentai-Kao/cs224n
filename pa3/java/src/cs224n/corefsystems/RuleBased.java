@@ -87,7 +87,7 @@ public class RuleBased implements CoreferenceSystem {
                 continue;
             }
             if (false || // TODO apposition
-                false || // TODO predicate nominative
+                isPredicateNominative(a, b) || // TODO predicate nominative
                 false || // TODO role appositive
                 false || // TODO relative pronoun
                 false || // TODO acronym
@@ -95,5 +95,13 @@ public class RuleBased implements CoreferenceSystem {
                 updateCoreferent(clusters, a, b);
             }
         }
+    }
+    
+    private boolean isPredicateNominative(Mention a, Mention b) {
+        System.out.println(a.sentence.words);
+        System.out.println(a.sentence.posTags);
+        return (a.sentence == b.sentence) &&
+               (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
+               a.sentence.words.get(a.endIndexExclusive).equals("is");
     }
 }
