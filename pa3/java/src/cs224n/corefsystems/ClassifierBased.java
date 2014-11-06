@@ -89,9 +89,9 @@ public class ClassifierBased implements CoreferenceSystem {
           return new Feature.SameGender(
                   Name.mostLikelyGender(onPrix.gloss()).equals(Name.mostLikelyGender(candidate.gloss())));
       } else if(clazz.equals(Feature.SameProperNoun.class)) {
-          return new Feature.SameProperNoun(onPrix.headToken().isProperNoun().equals(candidate.headToken().isProperNoun()));
+          return new Feature.SameProperNoun(onPrix.headToken().isProperNoun() == candidate.headToken().isProperNoun());
       } else if(clazz.equals(Feature.SamePluralNoun.class)) {
-          return new Feature.SamePluralNoun(onPrix.headToken().isPluralNoun().equals(candidate.headToken().isPluralNoun()));
+          return new Feature.SamePluralNoun(onPrix.headToken().isPluralNoun() == candidate.headToken().isPluralNoun());
       } else if(clazz.equals(Feature.SameHeadWord.class)) {
           return new Feature.SameHeadWord(onPrix.headWord().equals(candidate.headWord()));
       } else if(clazz.equals(Feature.SentenceLengthDifference.class)) {
@@ -99,7 +99,7 @@ public class ClassifierBased implements CoreferenceSystem {
       } else if(clazz.equals(Feature.SameSpeaker.class)) {
           return new Feature.SameSpeaker(onPrix.headToken().speaker().equals(candidate.headToken().speaker()));
       } else if(clazz.equals(Feature.SameLemmasLength.class)) {
-          return new Feature.SameLemmasLength(onPrix.sentence.lemmas.size().equals(candidate.sentence.lemmas.size()));
+          return new Feature.SameLemmasLength(onPrix.sentence.lemmas.size() == candidate.sentence.lemmas.size());
       } else if(clazz.equals(Feature.LemmasIntersectionSize.class)) {
           Set<String> intersectionSet = new HashSet<String>(onPrix.sentence.lemmas);
           Set<String> candidateLemmasSet = new HashSet<String>(candidate.sentence.lemmas);
