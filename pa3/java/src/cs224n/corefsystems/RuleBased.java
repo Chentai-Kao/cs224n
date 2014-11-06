@@ -13,6 +13,7 @@ import cs224n.coref.Document;
 import cs224n.coref.Entity;
 import cs224n.coref.Mention;
 import cs224n.util.Pair;
+import cs224n.util.StringUtils;
 
 public class RuleBased implements CoreferenceSystem {
 
@@ -98,9 +99,8 @@ public class RuleBased implements CoreferenceSystem {
     }
     
     private boolean isPredicateNominative(Mention a, Mention b) {
-        System.out.println(a.sentence.words);
-        System.out.println(a.sentence.posTags);
         return (a.sentence == b.sentence) &&
+               (a.headToken().isNoun() && b.headToken().isNoun()) &&
                (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
                a.sentence.words.get(a.endIndexExclusive).equals("is");
     }
