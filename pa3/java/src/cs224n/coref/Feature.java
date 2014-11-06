@@ -103,7 +103,11 @@ public interface Feature {
   
   public static class ContainsPronoun extends Indicator {
       public ContainsPronoun(boolean containsPronoun){ super(containsPronoun); }
-    }
+  }
+
+  public static class NamedEntityType extends StringIndicator {
+      public NamedEntityType(String namedEntityType){ super(namedEntityType); }
+  }
   
   /*
    * TODO: Add values to the indicators here.
