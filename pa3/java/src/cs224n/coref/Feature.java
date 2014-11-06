@@ -128,6 +128,10 @@ public interface Feature {
   public static class SameHeadWord extends Indicator {
       public SameHeadWord(boolean sameHeadWord){ super(sameHeadWord); }
   }
+
+  public static class SentenceLengthDifference extends IntIndicator {
+      public SentenceLengthDifference(int sentenceLengthDifference){ super(sentenceLengthDifference); }
+  }
   
   /*
    * TODO: Add values to the indicators here.
