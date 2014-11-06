@@ -45,6 +45,7 @@ public class ClassifierBased implements CoreferenceSystem {
       Feature.SentenceLengthDifference.class,
       Feature.SameSpeaker.class,
       Feature.SameLemmasLength.class,
+      Feature.SameLemmasCount.class,
 
       //skeleton for how to create a pair feature
       //Pair.make(Feature.IsFeature1.class, Feature.IsFeature2.class),
@@ -97,6 +98,11 @@ public class ClassifierBased implements CoreferenceSystem {
           return new Feature.SameSpeaker(onPrix.headToken().speaker() == candidate.headToken().speaker());
       } else if(clazz.equals(Feature.SameLemmasLength.class)) {
           return new Feature.SameLemmasLength(onPrix.sentence.lemmas.size() == candidate.sentence.lemmas.size());
+      } else if(clazz.equals(Feature.LemmasIntersectionSize.class)) {
+          Set<String> intersectionSet = new HashSet<String>(onPrix.sentence.lemmas);
+          Set<String> candidateLemmasSet = new HashSet<String>(candidate.sentence.lemmas);
+          intersectionSet.retainAll(candidateLemmasSet);
+          return new Feature.LemmasIntersectionSize(intersectionSet.size());
       } else {
         throw new IllegalArgumentException("Unregistered feature: " + clazz);
       }

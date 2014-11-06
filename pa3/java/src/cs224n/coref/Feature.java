@@ -145,6 +145,10 @@ public interface Feature {
       public SameLemmasLength(boolean sameLemmasLength){ super(sameLemmasLength); }
   }
   
+  public static class LemmasIntersectionSize extends IntIndicator {
+      public LemmasIntersectionSize(int lemmasIntersectionSize){ super(lemmasIntersectionSize); }
+  }
+  
   /*
    * TODO: Add values to the indicators here.
    */
