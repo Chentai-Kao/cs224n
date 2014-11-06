@@ -45,7 +45,7 @@ public class ClassifierBased implements CoreferenceSystem {
       Feature.SentenceLengthDifference.class,
       Feature.SameSpeaker.class,
       Feature.SameLemmasLength.class,
-      Feature.SameLemmasCount.class,
+      Feature.LemmasIntersectionSize.class,
 
       //skeleton for how to create a pair feature
       //Pair.make(Feature.IsFeature1.class, Feature.IsFeature2.class),
