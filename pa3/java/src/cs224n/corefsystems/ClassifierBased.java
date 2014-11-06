@@ -34,6 +34,7 @@ public class ClassifierBased implements CoreferenceSystem {
        */
 
       Feature.ExactMatch.class,
+      Feature.LowerCaseExactMatch.class,
       Feature.ContainsPronoun.class,
       Feature.NamedEntityType.class,
       Feature.LengthDifference.class,
@@ -74,6 +75,8 @@ public class ClassifierBased implements CoreferenceSystem {
       if(clazz.equals(Feature.ExactMatch.class)){
         //(exact string match)
         return new Feature.ExactMatch(onPrix.gloss().equals(candidate.gloss()));
+      } else if(clazz.equals(Feature.LowerCaseExactMatch.class)){
+          return new Feature.ExactMatch(onPrix.gloss().toLowerCase().equals(candidate.gloss().toLowerCase()));
       } else if(clazz.equals(Feature.ContainsPronoun.class)) {
         return new Feature.ContainsPronoun(
                 Pronoun.isSomePronoun(onPrix.gloss()) ||
@@ -93,7 +96,7 @@ public class ClassifierBased implements CoreferenceSystem {
       } else if(clazz.equals(Feature.SamePluralNoun.class)) {
           return new Feature.SamePluralNoun(onPrix.headToken().isPluralNoun() == candidate.headToken().isPluralNoun());
       } else if(clazz.equals(Feature.SameHeadWord.class)) {
-          return new Feature.SameHeadWord(onPrix.headWord().equals(candidate.headWord()));
+          return new Feature.SameHeadWord(onPrix.headWord().toLowerCase().equals(candidate.headWord().toLowerCase()));
       } else if(clazz.equals(Feature.SentenceLengthDifference.class)) {
           return new Feature.SentenceLengthDifference(onPrix.sentence.length() - candidate.sentence.length());
       } else if(clazz.equals(Feature.SameSpeaker.class)) {

@@ -101,6 +101,10 @@ public interface Feature {
     public ExactMatch(boolean exactMatch){ super(exactMatch); }
   }
   
+  public static class LowerCaseExactMatch extends Indicator {
+      public LowerCaseExactMatch(boolean lowerCaseExactMatch){ super(lowerCaseExactMatch); }
+  }
+  
   public static class ContainsPronoun extends Indicator {
       public ContainsPronoun(boolean containsPronoun){ super(containsPronoun); }
   }
@@ -156,6 +160,7 @@ public interface Feature {
   public static class SamePosTag extends Indicator {
       public SamePosTag(boolean samePosTag){ super(samePosTag); }
   }
+  
   
   /*
    * TODO: Add values to the indicators here.
