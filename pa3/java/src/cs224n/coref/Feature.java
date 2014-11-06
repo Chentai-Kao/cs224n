@@ -133,6 +133,10 @@ public interface Feature {
       public SentenceLengthDifference(int sentenceLengthDifference){ super(sentenceLengthDifference); }
   }
   
+  public static class SameSpeaker extends Indicator {
+      public SameSpeaker(boolean sameSpeaker){ super(sameSpeaker); }
+  }
+  
   /*
    * TODO: Add values to the indicators here.
    */
