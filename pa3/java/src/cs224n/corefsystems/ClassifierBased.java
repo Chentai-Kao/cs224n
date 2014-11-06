@@ -38,6 +38,8 @@ public class ClassifierBased implements CoreferenceSystem {
       Feature.NamedEntityType.class,
       Feature.OnPrixPhraseLength.class,
       Feature.CandidatePhraseLength.class,
+      Feature.BeginIndexDifference.class,
+      Feature.SameGender.class,
 
       //skeleton for how to create a pair feature
       //Pair.make(Feature.IsFeature1.class, Feature.IsFeature2.class),
@@ -76,6 +78,11 @@ public class ClassifierBased implements CoreferenceSystem {
       } else if(clazz.equals(Feature.CandidatePhraseLength.class)) {
           return new Feature.CandidatePhraseLength(
                   candidate.endIndexExclusive - candidate.beginIndexInclusive);
+      } else if(clazz.equals(Feature.BeginIndexDifference.class)) {
+          return new Feature.BeginIndexDifference(
+                  onPrix.beginIndexInclusive - candidate.beginIndexInclusive);
+      } else if(clazz.equals(Feature.SameGender.class)) {
+          return new Feature.SameGender(Name.gender(onPrix.gloss()) == Name.gender(candidate.gloss()));
       } else {
         throw new IllegalArgumentException("Unregistered feature: " + clazz);
       }

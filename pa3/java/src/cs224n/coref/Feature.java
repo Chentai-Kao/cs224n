@@ -117,6 +117,14 @@ public interface Feature {
       public CandidatePhraseLength(int candidatePhraseLength){ super(candidatePhraseLength); }
   }
   
+  public static class BeginIndexDifference extends IntIndicator {
+      public BeginIndexDifference(int beginIndexDifference){ super(beginIndexDifference); }
+  }
+
+  public static class SameGender extends Indicator {
+      public SameGender(boolean sameGender){ super(sameGender); }
+  }
+  
   /*
    * TODO: Add values to the indicators here.
    */
