@@ -124,6 +124,10 @@ public interface Feature {
   public static class SameProperNoun extends Indicator {
       public SameProperNoun(boolean sameProperNoun){ super(sameProperNoun); }
   }
+  
+  public static class SamePluralNoun extends Indicator {
+      public SamePluralNoun(boolean samePluralNoun){ super(samePluralNoun); }
+  }
 
   public static class SameHeadWord extends Indicator {
       public SameHeadWord(boolean sameHeadWord){ super(sameHeadWord); }
