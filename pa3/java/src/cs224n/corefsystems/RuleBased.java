@@ -73,7 +73,8 @@ public class RuleBased implements CoreferenceSystem {
             if (isCoreferent(clusters, a, b)) {
                 continue;
             }
-            if (a.gloss().equals(b.gloss())) {
+            if ((a.headToken().isNoun() && b.headToken().isNoun()) &&
+                    a.gloss().equals(b.gloss())) {
                 updateCoreferent(clusters, a, b);
             }
         }
