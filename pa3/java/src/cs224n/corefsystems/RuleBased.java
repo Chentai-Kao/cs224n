@@ -80,9 +80,13 @@ public class RuleBased implements CoreferenceSystem {
         for (Pair<Mention, Mention> mentionPair : mentionPairs) {
             Mention a = mentionPair.getFirst();
             Mention b = mentionPair.getSecond();
+            if (a.gloss().equals("Firestone")) {
+                System.out.println("(FIRESTONE)" + a.gloss() + " ***** " + b.gloss());
+            }
             if (isCoreferent(clusters, a, b)) {
                 continue;
             }
+            System.out.println("NOT COREFERENT");
             if (false || // TODO apposition
                 isPredicateNominative(a, b) || // TODO predicate nominative
                 false || // TODO role appositive
