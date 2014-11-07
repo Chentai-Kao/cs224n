@@ -103,6 +103,7 @@ public class RuleBased implements CoreferenceSystem {
     }
 
     private boolean isAppositive(Mention a, Mention b) {
+        System.out.println("token size:" + b.sentence.tokens.size() + "endindex" + b.endIndexExclusive);
         return a.sentence == b.sentence &&
                 (a.headToken().isNoun() && b.headToken().isNoun()) &&
                 (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
