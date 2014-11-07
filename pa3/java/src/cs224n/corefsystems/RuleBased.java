@@ -86,7 +86,9 @@ public class RuleBased implements CoreferenceSystem {
             if (isCoreferent(clusters, a, b)) {
                 continue;
             }
-            System.out.println("NOT COREFERENT");
+            if (a.gloss().equals("Firestone")) {
+                System.out.println("NOT COREFERENT");
+            }
             if (false || // TODO apposition
                 isPredicateNominative(a, b) || // TODO predicate nominative
                 false || // TODO role appositive
