@@ -125,19 +125,16 @@ public class RuleBased implements CoreferenceSystem {
     }
 
     private boolean isAcronym(Mention a, Mention b) {
+        String acronym = b.text().get(0);
         if (!a.headToken().posTag().equals("NNP") ||
                 !b.headToken().posTag().equals("NNP") ||
-                b.text().size() != 1) {
-            return false;
-        }
-        String acronym = b.text().get(0);
-        if (!StringUtils.isAcronym(acronym) ||
+                b.text().size() != 1 ||
+                !StringUtils.isAcronym(acronym) ||
                 a.text().size() != acronym.length()) {
             return false;
         }
         for (int i = 0; i < a.text().size(); ++i) {
-            String word = a.text().get(i);
-            if (word.charAt(0) != acronym.charAt(i)) {
+            if (a.text().get(i).charAt(0) != acronym.charAt(i)) {
                 return false;
             }
         }
