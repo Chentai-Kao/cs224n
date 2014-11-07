@@ -103,7 +103,6 @@ public class RuleBased implements CoreferenceSystem {
     }
 
     private boolean isAppositive(Mention a, Mention b) {
-        System.out.println("token size:" + b.sentence.tokens.size() + "endindex" + b.endIndexExclusive);
         return a.sentence == b.sentence &&
                 (a.headToken().isNoun() && b.headToken().isNoun()) &&
                 (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
@@ -111,7 +110,7 @@ public class RuleBased implements CoreferenceSystem {
                 a.sentence.words.get(a.endIndexExclusive).equals(",") &&
                 b.sentence.words.get(b.endIndexExclusive).equals(",") &&
                 b.sentence.words.size() >= b.endIndexExclusive + 2 &&
-                StringUtils.pennPOSToWordnetPOS(b.sentence.tokens.get(b.endIndexExclusive + 1).posTag()).equals("verb");
+                StringUtils.pennPOSToWordnetPOS(b.sentence.posTags.get(b.endIndexExclusive + 1)).equals("verb");
     }
 
     private boolean isPredicateNominative(Mention a, Mention b) {
