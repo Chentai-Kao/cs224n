@@ -67,9 +67,15 @@ public class RuleBased implements CoreferenceSystem {
 
     private void pass1(List<Pair<Mention, Mention>> mentionPairs,
             Map <Mention, ClusteredMention> clusters) {
+        HashMap<String, String> test = new HashMap<String, String>();
         for (Pair<Mention, Mention> mentionPair : mentionPairs) {
             Mention a = mentionPair.getFirst();
             Mention b = mentionPair.getSecond();
+            String t = a.headToken().posTag();
+            if (!test.containsKey(t)) {
+                System.out.println(t + " *** " + a.gloss());
+                test.put(t, a.gloss());
+            }
             if (isCoreferent(clusters, a, b)) {
                 continue;
             }
