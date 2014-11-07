@@ -89,6 +89,7 @@ public class RuleBased implements CoreferenceSystem {
                 false || // TODO relative pronoun
                 false || // TODO acronym
                 false) { // TODO demonym
+                System.out.println(a.gloss() + " ***** " + b.gloss() + " ##### " + isCoreferent(clusters, a, b));
                 updateCoreferent(clusters, a, b);
             }
         }
