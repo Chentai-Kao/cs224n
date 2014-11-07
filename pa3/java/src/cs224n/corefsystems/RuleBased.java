@@ -90,10 +90,9 @@ public class RuleBased implements CoreferenceSystem {
             if (false || // TODO apposition
                 isPredicateNominative(a, b) || // TODO predicate nominative
                 false || // TODO role appositive
-                false || // TODO relative pronoun
+                isRelativePronoun(a, b) || // TODO relative pronoun
                 false || // TODO acronym
                 false) { // TODO demonym
-                System.out.println(a.gloss() + " ***** " + b.gloss() + " ##### " + isCoreferent(clusters, a, b));
                 updateCoreferent(clusters, a, b);
             }
         }
@@ -104,5 +103,12 @@ public class RuleBased implements CoreferenceSystem {
                (a.headToken().isNoun() && b.headToken().isNoun()) &&
                (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
                a.sentence.words.get(a.endIndexExclusive).equals("is");
+    }
+    
+    private boolean isRelativePronoun(Mention a, Mention b) {
+        if (a.headToken().posTag().equals("RP")) {
+            System.out.println(a.gloss());
+        }
+        return (a.headToken().isNoun() && b.headToken().isNoun());
     }
 }
