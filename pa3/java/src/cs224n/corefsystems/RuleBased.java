@@ -91,16 +91,11 @@ public class RuleBased implements CoreferenceSystem {
                 System.out.println(a.gloss());
             }
             if (isAppositive(a, b) || // appositive
-                isPredicateNominative(a, b) || // predicate nominative
-                false || // TODO role appositive
-                isRelativePronoun(a, b) || // TODO relative pronoun
-                false || // TODO acronym
-                false) { // TODO demonym
-                
-                if (isAppositive(a, b)) {
-                    System.out.println(a.sentence);
-                }
-                
+                    isPredicateNominative(a, b) || // predicate nominative
+                    false || // TODO role appositive
+                    isRelativePronoun(a, b) || // TODO relative pronoun
+                    isAcronym(a, b) || // TODO acronym
+                    false) { // TODO demonym
                 updateCoreferent(clusters, a, b);
             }
         }
@@ -108,24 +103,45 @@ public class RuleBased implements CoreferenceSystem {
 
     private boolean isAppositive(Mention a, Mention b) {
         return a.sentence == b.sentence &&
-               (a.headToken().isNoun() && b.headToken().isNoun()) &&
-               (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
-               b.endIndexExclusive < b.sentence.length() &&
-               a.sentence.words.get(a.endIndexExclusive).equals(",") &&
-               b.sentence.words.get(b.endIndexExclusive).equals(",");
+                (a.headToken().isNoun() && b.headToken().isNoun()) &&
+                (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
+                b.endIndexExclusive < b.sentence.length() &&
+                a.sentence.words.get(a.endIndexExclusive).equals(",") &&
+                b.sentence.words.get(b.endIndexExclusive).equals(",");
     }
-    
+
     private boolean isPredicateNominative(Mention a, Mention b) {
         return a.sentence == b.sentence &&
-               (a.headToken().isNoun() && b.headToken().isNoun()) &&
-               (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
-               a.sentence.words.get(a.endIndexExclusive).equals("is");
+                (a.headToken().isNoun() && b.headToken().isNoun()) &&
+                (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
+                a.sentence.words.get(a.endIndexExclusive).equals("is");
     }
-    
+
     private boolean isRelativePronoun(Mention a, Mention b) {
         return a.sentence == b.sentence &&
-               a.beginIndexInclusive < b.beginIndexInclusive &&
-               a.endIndexExclusive > b.endIndexExclusive &&
-               b.headToken().posTag().equals("WP");
+                a.beginIndexInclusive < b.beginIndexInclusive &&
+                a.endIndexExclusive > b.endIndexExclusive &&
+                b.headToken().posTag().equals("WP");
     }
+
+    private boolean isAcronym(Mention a, Mention b) {
+        if (!a.headToken().posTag().equals("NNP") ||
+                !b.headToken().posTag().equals("NNP") ||
+                b.text().size() != 1) {
+            return false;
+        }
+        String acronym = b.text().get(0);
+        if (!StringUtils.isAcronym(acronym) ||
+                a.text().size() != acronym.length()) {
+            return false;
+        }
+        for (int i = 0; i < a.text().size(); ++i) {
+            String word = a.text().get(i);
+            if (word.charAt(0) != acronym.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
