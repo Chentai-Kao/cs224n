@@ -87,6 +87,9 @@ public class RuleBased implements CoreferenceSystem {
             if (isCoreferent(clusters, a, b)) {
                 continue;
             }
+            if (a.headToken().posTag().equals("RP")) {
+                System.out.println(a.gloss());
+            }
             if (false || // TODO apposition
                 isPredicateNominative(a, b) || // TODO predicate nominative
                 false || // TODO role appositive
@@ -106,9 +109,6 @@ public class RuleBased implements CoreferenceSystem {
     }
     
     private boolean isRelativePronoun(Mention a, Mention b) {
-        if (a.headToken().posTag().equals("RP")) {
-            System.out.println(a.gloss());
-        }
         return (a.headToken().isNoun() && b.headToken().isNoun());
     }
 }
