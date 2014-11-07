@@ -41,12 +41,8 @@ public class RuleBased implements CoreferenceSystem {
         // Multi-pass sieve (NLP 10')
         pass1(mentionPairs, clusters);
         pass2(mentionPairs, clusters);
-        // Create and return the mentions
-        List<ClusteredMention> mentions = new ArrayList<ClusteredMention>();
-        for (ClusteredMention cluster : clusters.values()) {
-            mentions.add(cluster);
-        }
-        return mentions;
+        // Return the mentions
+        return new ArrayList<ClusteredMention>(clusters.values()); 
     }
 
     // Check whether two mentions are already marked coreferent.
@@ -67,7 +63,6 @@ public class RuleBased implements CoreferenceSystem {
 
     private void pass1(List<Pair<Mention, Mention>> mentionPairs,
             Map <Mention, ClusteredMention> clusters) {
-        System.out.println("----------- PASS 1 START --------------");
         for (Pair<Mention, Mention> mentionPair : mentionPairs) {
             Mention a = mentionPair.getFirst();
             Mention b = mentionPair.getSecond();
@@ -78,12 +73,10 @@ public class RuleBased implements CoreferenceSystem {
                 updateCoreferent(clusters, a, b);
             }
         }
-        System.out.println("----------- PASS 1 END --------------");
     }
 
     private void pass2(List<Pair<Mention, Mention>> mentionPairs,
             Map <Mention, ClusteredMention> clusters) {
-        System.out.println("----------- PASS 2 START --------------");
         for (Pair<Mention, Mention> mentionPair : mentionPairs) {
             Mention a = mentionPair.getFirst();
             Mention b = mentionPair.getSecond();
@@ -99,7 +92,6 @@ public class RuleBased implements CoreferenceSystem {
                 updateCoreferent(clusters, a, b);
             }
         }
-        System.out.println("----------- PASS 2 END --------------");
     }
     
     private boolean isPredicateNominative(Mention a, Mention b) {
