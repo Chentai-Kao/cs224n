@@ -73,8 +73,7 @@ public class RuleBased implements CoreferenceSystem {
             if (isCoreferent(clusters, a, b)) {
                 continue;
             }
-            if (a.headToken().isNoun() && b.headToken().isNoun() &&
-                    a.gloss().equals(b.gloss())) {
+            if (a.gloss().equals(b.gloss())) {
                 updateCoreferent(clusters, a, b);
             }
         }
@@ -91,17 +90,31 @@ public class RuleBased implements CoreferenceSystem {
             if (a.headToken().posTag().equals("RP")) {
                 System.out.println(a.gloss());
             }
-            if (false || // TODO apposition
-                isPredicateNominative(a, b) || // TODO predicate nominative
+            if (isAppositive(a, b) || // appositive
+                isPredicateNominative(a, b) || // predicate nominative
                 false || // TODO role appositive
                 isRelativePronoun(a, b) || // TODO relative pronoun
                 false || // TODO acronym
                 false) { // TODO demonym
+                
+                if (isAppositive(a, b)) {
+                    System.out.println(a.sentence);
+                }
+                
                 updateCoreferent(clusters, a, b);
             }
         }
     }
 
+    private boolean isAppositive(Mention a, Mention b) {
+        return a.sentence == b.sentence &&
+               (a.headToken().isNoun() && b.headToken().isNoun()) &&
+               (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
+               b.endIndexExclusive < b.sentence.length() &&
+               a.sentence.words.get(a.endIndexExclusive).equals(",") &&
+               b.sentence.words.get(b.endIndexExclusive).equals(",");
+    }
+    
     private boolean isPredicateNominative(Mention a, Mention b) {
         return a.sentence == b.sentence &&
                (a.headToken().isNoun() && b.headToken().isNoun()) &&
