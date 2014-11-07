@@ -108,7 +108,9 @@ public class RuleBased implements CoreferenceSystem {
                 (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
                 b.endIndexExclusive < b.sentence.length() &&
                 a.sentence.words.get(a.endIndexExclusive).equals(",") &&
-                b.sentence.words.get(b.endIndexExclusive).equals(",");
+                b.sentence.words.get(b.endIndexExclusive).equals(",") &&
+                b.sentence.words.size() >= b.endIndexExclusive + 2 &&
+                StringUtils.pennPOSToWordnetPOS(b.sentence.tokens.get(b.endIndexExclusive + 1).posTag()).equals("verb");
     }
 
     private boolean isPredicateNominative(Mention a, Mention b) {
