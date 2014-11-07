@@ -67,15 +67,9 @@ public class RuleBased implements CoreferenceSystem {
 
     private void pass1(List<Pair<Mention, Mention>> mentionPairs,
             Map <Mention, ClusteredMention> clusters) {
-        HashMap<String, String> test = new HashMap<String, String>();
         for (Pair<Mention, Mention> mentionPair : mentionPairs) {
             Mention a = mentionPair.getFirst();
             Mention b = mentionPair.getSecond();
-            String t = a.headToken().posTag();
-            if (!test.containsKey(t)) {
-                System.out.println(t + " *** " + a.gloss());
-                test.put(t, a.gloss());
-            }
             if (isCoreferent(clusters, a, b)) {
                 continue;
             }
@@ -107,15 +101,18 @@ public class RuleBased implements CoreferenceSystem {
             }
         }
     }
-    
+
     private boolean isPredicateNominative(Mention a, Mention b) {
-        return (a.sentence == b.sentence) &&
+        return a.sentence == b.sentence &&
                (a.headToken().isNoun() && b.headToken().isNoun()) &&
                (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
                a.sentence.words.get(a.endIndexExclusive).equals("is");
     }
     
     private boolean isRelativePronoun(Mention a, Mention b) {
-        return (a.headToken().isNoun() && b.headToken().isNoun());
+        return a.sentence == b.sentence &&
+               a.beginIndexInclusive < b.beginIndexInclusive &&
+               a.endIndexExclusive > b.endIndexExclusive &&
+               b.headToken().posTag().equals("WP");
     }
 }
