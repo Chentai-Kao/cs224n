@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import cs224n.coref.ClusteredMention;
 import cs224n.coref.Document;
 import cs224n.coref.Entity;
 import cs224n.coref.Mention;
+import cs224n.ling.Tree;
 import cs224n.util.Pair;
 import cs224n.util.StringUtils;
 
@@ -38,6 +40,8 @@ public class RuleBased implements CoreferenceSystem {
                 mentionPairs.add(new Pair<Mention, Mention>(a, b));
             }
         }
+        // Hobb's algorithm.
+        hobbs(doc, clusters);
         // Multi-pass sieve (NLP 10')
         pass1(mentionPairs, clusters);
         pass2(mentionPairs, clusters);
@@ -62,6 +66,26 @@ public class RuleBased implements CoreferenceSystem {
         for (Mention m : mentionsToMerge) {
             m.removeCoreference();
             clusters.put(m, m.markCoreferent(clusters.get(a)));
+        }
+    }
+
+    private void hobbs(Document doc, Map <Mention, ClusteredMention> clusters) {
+        // Collect candidates of all pronouns.
+        for (Mention a : doc.getMentions()) {
+            if (a.text().size() == 1 && a.headToken().posTag().equals("PRP")) {
+                String candidate = runHobbs(a, doc);
+                if (candidate == null) {
+                    continue;
+                }
+                for (Mention b : doc.getMentions()) {
+                    if (isCoreferent(clusters, a, b)) {
+                        continue;
+                    }
+                    if (b.gloss().equals(candidate)) {
+                        updateCoreferent(clusters, a, b);
+                    }
+                }
+            }
         }
     }
 
@@ -102,6 +126,16 @@ public class RuleBased implements CoreferenceSystem {
         }
     }
 
+    private String runHobbs(Mention pronoun, Document doc) {
+        final Tree<String> root = pronoun.sentence.parse;
+        //int pronounSentenceIndex = doc.indexOfSentence(pronoun.sentence);
+        int wordIndex = pronoun.sentence.words.indexOf(pronoun.gloss());
+        // THE INDEX IS INCORRECT HERE!
+        LinkedList<Pair<String, Integer>> pathToPronoun = root.pathToIndex(wordIndex);
+
+        return null;
+    }
+
     private boolean isAppositive(Mention a, Mention b) {
         boolean condA = a.sentence == b.sentence &&
                 (a.headToken().isNoun() && b.headToken().isNoun()) &&
@@ -110,11 +144,11 @@ public class RuleBased implements CoreferenceSystem {
                 a.sentence.words.get(a.endIndexExclusive).equals(",") &&
                 b.sentence.words.get(b.endIndexExclusive).equals(",") &&
                 b.sentence.posTags.size() >= b.endIndexExclusive + 2;
-        if (!condA) {
-            return false;
-        }
-        String pos = StringUtils.pennPOSToWordnetPOS(b.sentence.posTags.get(b.endIndexExclusive + 1));
-        return pos != null && pos.equals("verb"); 
+                if (!condA) {
+                    return false;
+                }
+                String pos = StringUtils.pennPOSToWordnetPOS(b.sentence.posTags.get(b.endIndexExclusive + 1));
+                return pos != null && pos.equals("verb"); 
     }
 
     private boolean isPredicateNominative(Mention a, Mention b) {
