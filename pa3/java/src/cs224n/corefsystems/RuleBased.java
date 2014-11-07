@@ -103,13 +103,16 @@ public class RuleBased implements CoreferenceSystem {
     }
 
     private boolean isAppositive(Mention a, Mention b) {
+        if (b.endIndexExclusive + 1 >= b.sentence.posTags.size()) {
+            System.out.println(b.sentence + "," + b.sentence.posTags);
+        }
         return a.sentence == b.sentence &&
                 (a.headToken().isNoun() && b.headToken().isNoun()) &&
                 (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
                 b.endIndexExclusive < b.sentence.length() &&
                 a.sentence.words.get(a.endIndexExclusive).equals(",") &&
                 b.sentence.words.get(b.endIndexExclusive).equals(",") &&
-                b.sentence.words.size() >= b.endIndexExclusive + 2 &&
+                b.sentence.posTags.size() >= b.endIndexExclusive + 2 &&
                 StringUtils.pennPOSToWordnetPOS(b.sentence.posTags.get(b.endIndexExclusive + 1)).equals("verb");
     }
 
