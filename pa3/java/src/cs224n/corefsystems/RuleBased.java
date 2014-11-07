@@ -103,14 +103,18 @@ public class RuleBased implements CoreferenceSystem {
     }
 
     private boolean isAppositive(Mention a, Mention b) {
-        return a.sentence == b.sentence &&
+        boolean condA = a.sentence == b.sentence &&
                 (a.headToken().isNoun() && b.headToken().isNoun()) &&
                 (b.beginIndexInclusive - a.endIndexExclusive == 1) &&
                 b.endIndexExclusive < b.sentence.length() &&
                 a.sentence.words.get(a.endIndexExclusive).equals(",") &&
                 b.sentence.words.get(b.endIndexExclusive).equals(",") &&
-                b.sentence.posTags.size() >= b.endIndexExclusive + 2 &&
-                StringUtils.pennPOSToWordnetPOS(b.sentence.posTags.get(b.endIndexExclusive + 1)).equals("verb");
+                b.sentence.posTags.size() >= b.endIndexExclusive + 2;
+        if (!condA) {
+            return false;
+        }
+        String pos = StringUtils.pennPOSToWordnetPOS(b.sentence.posTags.get(b.endIndexExclusive + 1));
+        return pos != null && pos.equals("verb"); 
     }
 
     private boolean isPredicateNominative(Mention a, Mention b) {
