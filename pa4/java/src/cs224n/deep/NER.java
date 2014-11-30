@@ -24,11 +24,11 @@ public class NER {
         SimpleMatrix allVecs= FeatureFactory.readWordVectors("../data/wordVectors.txt");
 
         // initialize model
-        WindowModel model = new WindowModel(5, 100, 0.001);
+        BaselineModel model = new BaselineModel(5, 100, 0.001);
         model.initWeights();
 
         //TODO: Implement those two functions
-        //model.train(trainData);
-        //model.test(testData);
+        model.train(trainData);
+        model.test(testData);
     }
 }
