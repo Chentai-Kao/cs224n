@@ -29,7 +29,7 @@ public class NER {
         model.initWeights();
 
         //TODO: Implement those two functions
-        //model.train(trainData);
-        //model.test(testData);
+        model.train(trainData);
+        model.test(testData);
     }
 }

@@ -12,10 +12,6 @@ import java.text.*;
 
 public class BaselineModel {
 
-    protected SimpleMatrix L, W, Wout;
-
-    public int windowSize, wordSize, hiddenSize;
-    
     private HashMap<String, String> wordNerMap;
 
     public BaselineModel(){
