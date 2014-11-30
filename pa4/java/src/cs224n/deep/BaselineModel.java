@@ -12,13 +12,9 @@ import java.text.*;
 
 public class BaselineModel {
 
-    protected SimpleMatrix L, W, Wout;
-
-    public int windowSize, wordSize, hiddenSize;
-    
     private HashMap<String, String> wordNerMap;
 
-    public BaselineModel(int _windowSize, int _hiddenSize, double _lr){
+    public BaselineModel(){
         //TODO
         wordNerMap = new HashMap<String, String>();
     }
@@ -28,10 +24,6 @@ public class BaselineModel {
      */
     public void initWeights(){
         //TODO
-        // initialize with bias inside as the last column
-        // W = SimpleMatrix...
-        // U for the score
-        // U = SimpleMatrix...
     }
 
 
