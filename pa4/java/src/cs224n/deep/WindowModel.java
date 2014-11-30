@@ -12,15 +12,15 @@ public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
     //
-    public int windowSize, wordSize, hiddenSize, numGrams, wordVectorSize;
+    public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
 
     public WindowModel(int _windowSize, int _hiddenSize, double _lr){
         //TODO
         wordSize = 50;
-        numGrams = 3; // tri-gram model
-        wordVectorSize = wordSize * numGrams;
+        classSize = 5; // output prediction of 5 classes
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
+        wordVectorSize = wordSize * windowSize;
     }
 
     /**
@@ -32,7 +32,7 @@ public class WindowModel {
         // W for the hidden layer
         W = initMatrix(wordVectorSize, hiddenSize);
         // U for the score
-        U = initMatrix(hiddenSize, windowSize);
+        U = initMatrix(hiddenSize, classSize);
     }
 
 
@@ -68,12 +68,12 @@ public class WindowModel {
         }
         // p = g(Uh + b2) (element-wise)
         SimpleMatrix c = U.mult(h);
-        SimpleMatrix p = new SimpleMatrix(windowSize, 1);
-        for (int i = 0; i < windowSize; ++i) {
+        SimpleMatrix p = new SimpleMatrix(classSize, 1);
+        for (int i = 0; i < classSize; ++i) {
             p.set(i, 0, Math.exp(c.get(i, 0))); // normalize later
         }
         double norm = 0; // normalization
-        for (int i = 0; i < windowSize; ++i) {
+        for (int i = 0; i < classSize; ++i) {
             norm += p.get(i);
         }
         p.scale(1 / norm);
@@ -81,16 +81,15 @@ public class WindowModel {
     }
 
     private SimpleMatrix buildInputVector(List<String> words) {
+        assert words.size() == windowSize; 
         // concatenate input vector by [x_{i-1} x_i x_{i+1}]
-        SimpleMatrix x = new SimpleMatrix(wordSize * words.size() + 1, 1);
-        for (int i = 0; i < words.size(); ++i) {
+        SimpleMatrix x = new SimpleMatrix(windowSize, 1);
+        for (int i = 0; i < windowSize; ++i) {
             String word = words.get(i);
-            if (FeatureFactory.wordToNum.containsKey(word)) {
-                int wordIndex = FeatureFactory.wordToNum.get(word);
-                int offset = i * wordSize;
-                for (int j = 0; j < wordSize; ++j) {
-                    x.set(offset + j, 0, FeatureFactory.allVecs.get(wordIndex, j));
-                }
+            int wordIndex = FeatureFactory.wordToNum.get(word);
+            int offset = i * wordSize;
+            for (int j = 0; j < wordSize; ++j) {
+                x.set(offset + j, 0, FeatureFactory.allVecs.get(wordIndex, j));
             }
         }
         return x;
