@@ -12,9 +12,13 @@ import java.text.*;
 
 public class BaselineModel {
 
+    protected SimpleMatrix L, W, Wout;
+
+    public int windowSize, wordSize, hiddenSize;
+    
     private HashMap<String, String> wordNerMap;
 
-    public BaselineModel(){
+    public BaselineModel(int _windowSize, int _hiddenSize, double _lr){
         //TODO
         wordNerMap = new HashMap<String, String>();
     }

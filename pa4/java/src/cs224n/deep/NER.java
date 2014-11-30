@@ -24,7 +24,7 @@ public class NER {
         SimpleMatrix allVecs = FeatureFactory.readWordVectors("../data/wordVectors.txt");
 
         // initialize model
-        BaselineModel model = new BaselineModel();
+        BaselineModel model = new BaselineModel(5, 100, 0.001);
         //WindowModel model = new WindowModel(5, 100, 0.001);
         model.initWeights();
 
