@@ -10,12 +10,16 @@ import java.text.*;
 
 public class WindowModel {
 
-    protected SimpleMatrix L, W, Wout;
+    protected SimpleMatrix U, W, Wout;
     //
-    public int windowSize,wordSize, hiddenSize;
+    public int windowSize, wordSize, hiddenSize, numGrams;
 
     public WindowModel(int _windowSize, int _hiddenSize, double _lr){
         //TODO
+        wordSize = 50;
+        numGrams = 3;
+        windowSize = _windowSize;
+        hiddenSize = _hiddenSize;
     }
 
     /**
@@ -24,9 +28,11 @@ public class WindowModel {
     public void initWeights(){
         //TODO
         // initialize with bias inside as the last column
-        // W = SimpleMatrix...
+        double epsilonW = Math.sqrt(6) / Math.sqrt(wordSize * numGrams + hiddenSize);
+        W = SimpleMatrix.random(hiddenSize, wordSize * numGrams, -epsilonW, epsilonW, new Random());
         // U for the score
-        // U = SimpleMatrix...
+        double epsilonU = Math.sqrt(6) / Math.sqrt(hiddenSize + windowSize);
+        U = SimpleMatrix.random(windowSize, hiddenSize, -epsilonU, epsilonU, new Random());
     }
 
 
