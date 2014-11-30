@@ -18,7 +18,7 @@ public class BaselineModel {
     
     private HashMap<String, String> wordNerMap;
 
-    public BaselineModel(int _windowSize, int _hiddenSize, double _lr){
+    public BaselineModel(){
         //TODO
         wordNerMap = new HashMap<String, String>();
     }
