@@ -17,7 +17,7 @@ public class WindowModel {
     public WindowModel(int _windowSize, int _hiddenSize, double _lr){
         //TODO
         wordSize = 50;
-        numGrams = 3;
+        numGrams = 3; // tri-gram model
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
     }
@@ -28,11 +28,10 @@ public class WindowModel {
     public void initWeights(){
         //TODO
         // initialize with bias inside as the last column
-        double epsilonW = Math.sqrt(6) / Math.sqrt(wordSize * numGrams + hiddenSize);
-        W = SimpleMatrix.random(hiddenSize, wordSize * numGrams, -epsilonW, epsilonW, new Random());
+        // W for the hidden layer
+        W = initMatrix(wordSize * numGrams, hiddenSize);
         // U for the score
-        double epsilonU = Math.sqrt(6) / Math.sqrt(hiddenSize + windowSize);
-        U = SimpleMatrix.random(windowSize, hiddenSize, -epsilonU, epsilonU, new Random());
+        U = initMatrix(hiddenSize, windowSize);
     }
 
 
@@ -46,6 +45,16 @@ public class WindowModel {
 
     public void test(List<Datum> testData){
         // TODO
+    }
+    
+    private SimpleMatrix initMatrix(int fanIn, int fanOut) {
+        double epsilon = Math.sqrt(6) / Math.sqrt(fanIn + fanOut);
+        SimpleMatrix V = SimpleMatrix.random(fanIn, fanOut + 1, -epsilon, epsilon, new Random());
+        // initialize bias to zero
+        for (int i = 0; i < fanIn; ++i) {
+            V.set(i, fanOut - 1, 0);
+        }
+        return V;
     }
 
 }
