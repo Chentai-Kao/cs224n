@@ -33,7 +33,7 @@ public class WindowModel {
     /**
      * Simplest SGD training
      */
-    public void train(List<Datum> _trainData ){
+    public void train(List<Datum> _trainData){
         // TODO
     }
 
