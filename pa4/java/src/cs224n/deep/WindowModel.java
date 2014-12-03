@@ -11,7 +11,8 @@ import java.text.*;
 public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
-    //
+    private SimpleMatrix p, q, h, z; // all row-vector
+    
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
 
     public WindowModel(int _windowSize, int _hiddenSize, double _lr){
@@ -41,6 +42,9 @@ public class WindowModel {
      */
     public void train(List<Datum> _trainData){
         // TODO
+        for (int i = 0; i < _trainData.size(); ++i) {
+            System.out.println(_trainData.get(i));
+        }
     }
 
 
@@ -57,30 +61,29 @@ public class WindowModel {
         }
         return V;
     }
-    
-    private SimpleMatrix feedForward(List<String> words) {
-        SimpleMatrix x = buildInputVector(words);
+
+    // perform feed forward of data x, update class variables p, q, ..., etc
+    private void feedForward(SimpleMatrix x) {
         // h = f(Wx + b1) (element-wise)
-        SimpleMatrix z = W.mult(x);
-        SimpleMatrix h = new SimpleMatrix(hiddenSize, 1);
+        z = W.mult(x);
+        h = new SimpleMatrix(hiddenSize, 1);
         for (int i = 0; i < hiddenSize; ++i) {
             h.set(i, 0, Math.tanh(z.get(i, 0)));
         }
         // p = g(Uh + b2) (element-wise)
-        SimpleMatrix c = U.mult(h);
-        SimpleMatrix p = new SimpleMatrix(classSize, 1);
+        q = U.mult(h);
+        p = new SimpleMatrix(classSize, 1);
         for (int i = 0; i < classSize; ++i) {
-            p.set(i, 0, Math.exp(c.get(i, 0))); // normalize later
+            p.set(i, 0, Math.exp(q.get(i, 0))); // normalize later
         }
         double norm = 0; // normalization
         for (int i = 0; i < classSize; ++i) {
             norm += p.get(i);
         }
         p.scale(1 / norm);
-        return p;
     }
 
-    private SimpleMatrix buildInputVector(List<String> words) {
+    private SimpleMatrix buildX(List<String> words) {
         assert words.size() == windowSize; 
         // concatenate input vector by [x_{i-1} x_i x_{i+1}]
         SimpleMatrix x = new SimpleMatrix(windowSize, 1);
@@ -93,5 +96,29 @@ public class WindowModel {
             }
         }
         return x;
+    }
+    
+    // given data (x, y), update U by SGD of dJ_R / dU.
+    // labmda: parameter of regularized term.
+    // alpha: SGD learning rate.
+    private void updateU(SimpleMatrix x, SimpleMatrix y, double lambda, double alpha) {
+        // calculate dJR / dU
+        SimpleMatrix dJRdU = new SimpleMatrix(U.numRows(), U.numCols());
+        dJRdU.zero();
+        double reg = lambda * U.elementSum(); // regularized term, lambda * sum_j sum_k U_jk
+        for (int k = 0; k < dJRdU.numCols(); ++k) {
+            // part of unregularized term, "sum_j y_j(1-p_j)"
+            double partialSum = 0;
+            for (int j = 0; j < dJRdU.numRows(); ++j) {
+                partialSum += y.get(j, 0) * (1 - p.get(j, 0));
+            }
+            double unreg = -partialSum * h.get(k, 0);
+            // update elements of dJRdU_jk
+            for (int j = 0; j < dJRdU.numRows(); ++j) {
+                dJRdU.set(j, k, unreg + reg);
+            }
+        }
+        // update U by SGD
+        U = U.minus(dJRdU.scale(alpha));
     }
 }
