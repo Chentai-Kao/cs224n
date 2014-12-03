@@ -43,7 +43,7 @@ public class WindowModel {
     public void train(List<Datum> _trainData){
         // TODO
         for (int i = 0; i < _trainData.size(); ++i) {
-            System.out.println(_trainData.get(i));
+            System.out.println(_trainData.get(i).toString());
         }
     }
 
