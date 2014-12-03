@@ -130,12 +130,13 @@ public class WindowModel {
     private SimpleMatrix buildX(List<Datum> sentence, int start) { 
         // concatenate input vector by [x_{i-1} x_i x_{i+1}]
         SimpleMatrix x = new SimpleMatrix(windowSize, 1);
+        int index = 0;
         for (int i = 0; i < windowSize; ++i) {
             String word = sentence.get(start + i).word;
             int wordIndex = FeatureFactory.wordToNum.get(word);
-            int offset = i * wordSize;
             for (int j = 0; j < wordSize; ++j) {
-                x.set(offset + j, 0, FeatureFactory.allVecs.get(wordIndex, j));
+                x.set(index, 0, FeatureFactory.allVecs.get(wordIndex, j));
+                ++index;
             }
         }
         return x;
