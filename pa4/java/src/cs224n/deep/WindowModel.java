@@ -63,6 +63,7 @@ public class WindowModel {
                 System.out.println("(" + sentence.get(i).word + "," + sentence.get(i).label + ") => (y, x)");
                 System.out.println(x);
                 System.out.println(y);
+                System.console().readLine();
             }
         }
     }
