@@ -36,14 +36,12 @@ public class FeatureFactory {
         BufferedReader in = new BufferedReader(new FileReader(filename));
         for (String line = in.readLine(); line != null; line = in.readLine()) {
             if (line.trim().length() == 0) {
+                data.add(new Datum("</s>", null));
+                data.add(new Datum("<s>", null));
                 continue;
             }
             String[] bits = line.split("\\s+");
-            String word = bits[0];
-            String label = bits[1];
-
-            Datum datum = new Datum(word, label);
-            data.add(datum);
+            data.add(new Datum(bits[0], bits[1]));
         }
 
         return data;
