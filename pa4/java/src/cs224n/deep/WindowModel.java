@@ -12,6 +12,7 @@ public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
     private SimpleMatrix p, q, h, z; // all row-vector
+    private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y 
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
 
@@ -22,6 +23,14 @@ public class WindowModel {
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
         wordVectorSize = wordSize * windowSize;
+        String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
+        labelToY = new HashMap<String, SimpleMatrix>();
+        for (int i = 0; i < 5; ++i) {
+            SimpleMatrix y = new SimpleMatrix(5, 1);
+            y.zero();
+            y.set(i, 0, 1);
+            labelToY.put(labels[i], y);
+        }
     }
 
     /**
@@ -42,8 +51,19 @@ public class WindowModel {
      */
     public void train(List<Datum> _trainData){
         // TODO
-        for (int i = 0; i < _trainData.size(); ++i) {
-            System.out.println(_trainData.get(i).toString());
+        List<List<Datum>> sentences = extractSentences(_trainData);
+        for (List<Datum> sentence : sentences) {
+            for (int i = 0; i < sentence.size(); ++i) {
+                System.out.print(sentence.get(i) + " ");
+            }
+            System.out.println("");
+            for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
+                SimpleMatrix x = buildX(sentence, i);
+                SimpleMatrix y = labelToY.get(sentence.get(i).label);
+                System.out.println("(" + sentence.get(i).word + "," + sentence.get(i).label + ") => (y, x)");
+                System.out.println(x);
+                System.out.println(y);
+            }
         }
     }
 
@@ -60,6 +80,29 @@ public class WindowModel {
             V.set(i, fanOut - 1, 0);
         }
         return V;
+    }
+    
+    // from the start index, find a complete sentence from trainData
+    private List<List<Datum>> extractSentences(List<Datum> trainData) {
+        List<List<Datum>> sentences = new ArrayList<List<Datum>>();
+        for (int i = 0; i < trainData.size(); ++i) {
+            // find a complete sentence ["<s>", "word", ..., "</s>"] 
+            if (trainData.get(i).word.equals("<s>")) {
+                continue;
+            }
+            List<Datum> sentence = null;
+            for (int j = i; j < trainData.size(); ++j) {
+                // find the end of sentence
+                if (trainData.get(j).word.equals("</s>")) {
+                    sentence = trainData.subList(i, j + 1);
+                    break;
+                }
+            }
+            if (sentence != null) {
+                sentences.add(sentence);
+            }
+        }
+        return sentences;
     }
 
     // perform feed forward of data x, update class variables p, q, ..., etc
@@ -83,12 +126,11 @@ public class WindowModel {
         p.scale(1 / norm);
     }
 
-    private SimpleMatrix buildX(List<String> words) {
-        assert words.size() == windowSize; 
+    private SimpleMatrix buildX(List<Datum> sentence, int start) { 
         // concatenate input vector by [x_{i-1} x_i x_{i+1}]
         SimpleMatrix x = new SimpleMatrix(windowSize, 1);
         for (int i = 0; i < windowSize; ++i) {
-            String word = words.get(i);
+            String word = sentence.get(start + i).word;
             int wordIndex = FeatureFactory.wordToNum.get(word);
             int offset = i * wordSize;
             for (int j = 0; j < wordSize; ++j) {
