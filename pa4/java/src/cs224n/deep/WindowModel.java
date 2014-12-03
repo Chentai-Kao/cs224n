@@ -54,7 +54,7 @@ public class WindowModel {
         List<List<Datum>> sentences = extractSentences(_trainData);
         for (List<Datum> sentence : sentences) {
             for (int i = 0; i < sentence.size(); ++i) {
-                System.out.print(sentence.get(i) + " ");
+                System.out.print(sentence.get(i).word + " ");
             }
             System.out.println("");
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
