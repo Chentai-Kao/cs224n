@@ -88,7 +88,7 @@ public class WindowModel {
         List<List<Datum>> sentences = new ArrayList<List<Datum>>();
         for (int i = 0; i < trainData.size(); ++i) {
             // find a complete sentence ["<s>", "word", ..., "</s>"] 
-            if (trainData.get(i).word.equals("<s>")) {
+            if (!trainData.get(i).word.equals("<s>")) {
                 continue;
             }
             List<Datum> sentence = null;
