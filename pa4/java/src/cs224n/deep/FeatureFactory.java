@@ -61,8 +61,8 @@ public class FeatureFactory {
             String[] vec = line.trim().split("\\s+");
             for (int i = 0; i < vec.length; ++i) {
                 allVecs.set(pos, i, Double.parseDouble(vec[i]));
-                ++pos;
             }
+            ++pos;
         }
         in.close();
         return allVecs;
