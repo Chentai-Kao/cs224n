@@ -56,11 +56,13 @@ public class WindowModel {
             for (int i = 0; i < sentence.size(); ++i) {
                 System.out.print(sentence.get(i).word + " ");
             }
+            int halfWindowSize = windowSize / 2;
             System.out.println("");
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                 SimpleMatrix x = buildX(sentence, i);
-                SimpleMatrix y = labelToY.get(sentence.get(i).label);
-                System.out.println("(" + sentence.get(i).word + "," + sentence.get(i).label + ") => (y, x)");
+                Datum centerWord = sentence.get(i + halfWindowSize);
+                SimpleMatrix y = labelToY.get(centerWord.label);
+                System.out.println("(" + centerWord.word + "," + centerWord.label + ") => (y, x)");
                 System.out.println(x);
                 System.out.println(y);
                 System.console().readLine();
