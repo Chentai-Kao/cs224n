@@ -11,7 +11,7 @@ import java.text.*;
 public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
-    private SimpleMatrix p, q, h, z, b1, b2; // row-vector, updated by feedForward()
+    private SimpleMatrix p, q, h, z, b1, b2, delta1, delta2; // row-vector, updated by feedForward() 
     private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y 
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
@@ -26,10 +26,7 @@ public class WindowModel {
         String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
         labelToY = new HashMap<String, SimpleMatrix>();
         for (int i = 0; i < 5; ++i) {
-            SimpleMatrix y = new SimpleMatrix(5, 1);
-            y.zero();
-            y.set(i, 0, 1);
-            labelToY.put(labels[i], y);
+            labelToY.put(labels[i], ones(5, 1));
         }
     }
 
@@ -61,8 +58,9 @@ public class WindowModel {
                 SimpleMatrix x = buildX(sentence, i);
                 Datum centerWord = sentence.get(i + halfWindowSize);
                 SimpleMatrix y = labelToY.get(centerWord.label);
-                // TODO feedforward + back propagation
                 feedForward(x);
+                buildDelta(x, y);
+                backPropagation(x, y);
             }
         }
     }
@@ -121,6 +119,10 @@ public class WindowModel {
         }
         p.scale(1 / norm);
     }
+    
+    private void backPropagation(SimpleMatrix x, SimpleMatrix y) {
+        // TODO
+    }
 
     private SimpleMatrix buildX(List<Datum> sentence, int start) { 
         // concatenate input vector by [x_{i-1} x_i x_{i+1}]
@@ -139,6 +141,17 @@ public class WindowModel {
             }
         }
         return x;
+    }
+    
+    private void buildDelta(SimpleMatrix x, SimpleMatrix y) {
+        // delta 2
+        delta2 = p.minus(y);
+        // delta 1
+        SimpleMatrix temp = new SimpleMatrix(hiddenSize, 1);
+        for (int i = 0; i < hiddenSize; ++i) {
+            temp.set(i, 0, 1 - Math.pow(Math.tanh(z.get(i, 0)), 2));
+        }
+        delta1 = U.transpose().elementMult(temp);
     }
     
     // given data (x, y), update U by SGD of dJ_R / dU.
@@ -163,5 +176,12 @@ public class WindowModel {
         }
         // update U by SGD
         U = U.minus(dJRdU.scale(alpha));
+    }
+    
+    // return a one vector of given dimension
+    private SimpleMatrix ones(int numRows, int numCols) {
+        SimpleMatrix m = new SimpleMatrix(numRows, numCols);
+        m.set(1);
+        return m;
     }
 }
