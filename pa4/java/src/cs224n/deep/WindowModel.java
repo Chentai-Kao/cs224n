@@ -133,6 +133,10 @@ public class WindowModel {
         int index = 0;
         for (int i = 0; i < windowSize; ++i) {
             String word = sentence.get(start + i).word;
+            if (!FeatureFactory.wordToNum.containsKey(word)) {
+                // word not found in vocabulary
+                word = "UUUNKKK";
+            }
             int wordIndex = FeatureFactory.wordToNum.get(word);
             for (int j = 0; j < wordSize; ++j) {
                 x.set(index, 0, FeatureFactory.allVecs.get(wordIndex, j));
