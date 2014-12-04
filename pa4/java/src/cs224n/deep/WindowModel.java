@@ -61,6 +61,7 @@ public class WindowModel {
                 buildXY(sentence, i);
                 System.out.println(x);
                 System.out.println(y);
+                System.console().readLine();
                 feedForward();
                 buildDelta();
                 backPropagation();
