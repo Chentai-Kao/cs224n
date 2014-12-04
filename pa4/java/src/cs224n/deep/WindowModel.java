@@ -11,7 +11,8 @@ import java.text.*;
 public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
-    private SimpleMatrix p, q, h, z, b1, b2, delta1, delta2; // row-vector, updated by feedForward() 
+    private SimpleMatrix p, q, h, z, b1, b2, delta1, delta2; // row-vector, updated by feedForward()
+    private double alpha, lambda; // learning rate alpha, regularization lambda
     private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y 
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
@@ -23,6 +24,8 @@ public class WindowModel {
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
         wordVectorSize = wordSize * windowSize;
+        alpha = 0.001;
+        lambda = 1;
         String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
         labelToY = new HashMap<String, SimpleMatrix>();
         for (int i = 0; i < 5; ++i) {
@@ -122,6 +125,7 @@ public class WindowModel {
     
     private void backPropagation(SimpleMatrix x, SimpleMatrix y) {
         // TODO
+        updateU(x, y);
     }
 
     private SimpleMatrix buildX(List<Datum> sentence, int start) { 
@@ -155,9 +159,7 @@ public class WindowModel {
     }
     
     // given data (x, y), update U by SGD of dJ_R / dU.
-    // labmda: parameter of regularized term.
-    // alpha: SGD learning rate.
-    private void updateU(SimpleMatrix x, SimpleMatrix y, double lambda, double alpha) {
+    private void updateU(SimpleMatrix x, SimpleMatrix y) {
         // dJR / dU
         SimpleMatrix dJRdU = delta2.mult(h.transpose()); // TODO not sure whether * (1 / m)?
         // add regularized term, lambda * sum_j sum_k U_jk
