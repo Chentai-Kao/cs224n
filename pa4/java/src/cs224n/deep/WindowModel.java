@@ -158,22 +158,10 @@ public class WindowModel {
     // labmda: parameter of regularized term.
     // alpha: SGD learning rate.
     private void updateU(SimpleMatrix x, SimpleMatrix y, double lambda, double alpha) {
-        // calculate dJR / dU
-        SimpleMatrix dJRdU = new SimpleMatrix(U.numRows(), U.numCols());
-        dJRdU.zero();
-        double reg = lambda * U.elementSum(); // regularized term, lambda * sum_j sum_k U_jk
-        for (int k = 0; k < dJRdU.numCols(); ++k) {
-            // part of unregularized term, "sum_j y_j(1-p_j)"
-            double partialSum = 0;
-            for (int j = 0; j < dJRdU.numRows(); ++j) {
-                partialSum += y.get(j, 0) * (1 - p.get(j, 0));
-            }
-            double unreg = -partialSum * h.get(k, 0);
-            // update elements of dJRdU_jk
-            for (int j = 0; j < dJRdU.numRows(); ++j) {
-                dJRdU.set(j, k, unreg + reg);
-            }
-        }
+        // dJR / dU
+        SimpleMatrix dJRdU = delta2.mult(h.transpose()); // TODO not sure whether * (1 / m)?
+        // add regularized term, lambda * sum_j sum_k U_jk
+        elementAdd(dJRdU, lambda * U.elementSum());
         // update U by SGD
         U = U.minus(dJRdU.scale(alpha));
     }
@@ -183,5 +171,14 @@ public class WindowModel {
         SimpleMatrix m = new SimpleMatrix(numRows, numCols);
         m.set(1);
         return m;
+    }
+    
+    // perform elementwise add on the matrix
+    private void elementAdd(SimpleMatrix m, double v) {
+        for (int i = 0; i < m.numRows(); ++i) {
+            for (int j = 0; j < m.numCols(); ++j) {
+                m.set(i, j, v + m.get(i, j));
+            }
+        }
     }
 }
