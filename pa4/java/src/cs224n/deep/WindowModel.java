@@ -151,7 +151,7 @@ public class WindowModel {
         for (int i = 0; i < hiddenSize; ++i) {
             temp.set(i, 0, 1 - Math.pow(Math.tanh(z.get(i, 0)), 2));
         }
-        delta1 = U.transpose().elementMult(temp);
+        delta1 = U.transpose().mult(delta2).elementMult(temp);
     }
     
     // given data (x, y), update U by SGD of dJ_R / dU.
