@@ -11,7 +11,7 @@ import java.text.*;
 public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
-    private SimpleMatrix p, q, h, z; // row-vector, updated by feedForward()
+    private SimpleMatrix p, q, h, z, b1, b2; // row-vector, updated by feedForward()
     private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y 
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
@@ -40,9 +40,12 @@ public class WindowModel {
         //TODO
         // initialize with bias inside as the last column
         // W for the hidden layer
-        W = initMatrix(wordVectorSize, hiddenSize);
+        W = initMatrix(hiddenSize, wordVectorSize);
         // U for the score
-        U = initMatrix(hiddenSize, classSize);
+        U = initMatrix(classSize, hiddenSize);
+        // intercept term
+        b1 = initMatrix(hiddenSize, 1);
+        b2 = initMatrix(classSize, 1);
     }
 
 
@@ -69,13 +72,9 @@ public class WindowModel {
         // TODO
     }
     
-    private SimpleMatrix initMatrix(int fanIn, int fanOut) {
+    private SimpleMatrix initMatrix(int fanOut, int fanIn) {
         double epsilon = Math.sqrt(6) / Math.sqrt(fanIn + fanOut);
-        SimpleMatrix V = SimpleMatrix.random(fanOut, fanIn + 1, -epsilon, epsilon, new Random());
-        // initialize intercept term (bias) to zero
-        for (int i = 0; i < fanOut; ++i) {
-            V.set(i, fanIn, 0);
-        }
+        SimpleMatrix V = SimpleMatrix.random(fanOut, fanIn, -epsilon, epsilon, new Random());
         return V;
     }
     
@@ -105,13 +104,13 @@ public class WindowModel {
     // perform feed forward of data x, update class variables p, q, ..., etc
     private void feedForward(SimpleMatrix x) {
         // h = f(Wx + b1) (element-wise)
-        z = W.mult(x);
+        z = W.mult(x).plus(b1);
         h = new SimpleMatrix(hiddenSize, 1);
         for (int i = 0; i < hiddenSize; ++i) {
             h.set(i, 0, Math.tanh(z.get(i, 0)));
         }
         // p = g(Uh + b2) (element-wise)
-        q = U.mult(h);
+        q = U.mult(h).plus(b2);
         p = new SimpleMatrix(classSize, 1);
         for (int i = 0; i < classSize; ++i) {
             p.set(i, 0, Math.exp(q.get(i, 0))); // normalize later
