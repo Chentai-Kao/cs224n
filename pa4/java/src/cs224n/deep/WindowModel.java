@@ -11,7 +11,7 @@ import java.text.*;
 public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
-    private SimpleMatrix p, q, h, z; // all row-vector
+    private SimpleMatrix p, q, h, z; // row-vector, updated by feedForward()
     private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y 
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
@@ -58,6 +58,8 @@ public class WindowModel {
                 SimpleMatrix x = buildX(sentence, i);
                 Datum centerWord = sentence.get(i + halfWindowSize);
                 SimpleMatrix y = labelToY.get(centerWord.label);
+                // TODO feedforward + back propagation
+                feedForward(x);
             }
         }
     }
