@@ -11,6 +11,7 @@ import java.text.*;
 public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
+    private SimpleMatrix x, y; // current data
     private SimpleMatrix p, q, h, z, b1, b2, delta1, delta2; // row-vector, updated by feedForward()
     private double alpha, lambda; // learning rate alpha, regularization lambda
     private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y 
@@ -56,14 +57,13 @@ public class WindowModel {
         // TODO
         List<List<Datum>> sentences = extractSentences(_trainData);
         for (List<Datum> sentence : sentences) {
-            int halfWindowSize = windowSize / 2;
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
-                SimpleMatrix x = buildX(sentence, i);
-                Datum centerWord = sentence.get(i + halfWindowSize);
-                SimpleMatrix y = labelToY.get(centerWord.label);
-                feedForward(x);
-                buildDelta(x, y);
-                backPropagation(x, y);
+                buildXY(sentence, i);
+                System.out.println(x);
+                System.out.println(y);
+                feedForward();
+                buildDelta();
+                backPropagation();
             }
         }
     }
@@ -103,7 +103,7 @@ public class WindowModel {
     }
 
     // perform feed forward of data x, update class variables p, q, ..., etc
-    private void feedForward(SimpleMatrix x) {
+    private void feedForward() {
         // h = f(Wx + b1) (element-wise)
         z = W.mult(x).plus(b1);
         h = new SimpleMatrix(hiddenSize, 1);
@@ -123,13 +123,12 @@ public class WindowModel {
         p.scale(1 / norm);
     }
     
-    private void backPropagation(SimpleMatrix x, SimpleMatrix y) {
+    private void backPropagation() {
         // TODO
-        updateU(x, y);
     }
 
-    private SimpleMatrix buildX(List<Datum> sentence, int start) { 
-        // concatenate input vector by [x_{i-1} x_i x_{i+1}]
+    private void buildXY(List<Datum> sentence, int start) { 
+        // build x. concatenate input vector by [x_{i-1} x_i x_{i+1}]
         SimpleMatrix x = new SimpleMatrix(windowSize * wordSize, 1);
         int pos = 0;
         for (int i = 0; i < windowSize; ++i) {
@@ -144,10 +143,12 @@ public class WindowModel {
                 ++pos;
             }
         }
-        return x;
+        // build y
+        Datum centerWord = sentence.get(start + windowSize / 2);
+        y = labelToY.get(centerWord.label);
     }
     
-    private void buildDelta(SimpleMatrix x, SimpleMatrix y) {
+    private void buildDelta() {
         // delta 2
         delta2 = p.minus(y);
         // delta 1
@@ -159,13 +160,21 @@ public class WindowModel {
     }
     
     // given data (x, y), update U by SGD of dJ_R / dU.
-    private void updateU(SimpleMatrix x, SimpleMatrix y) {
+    private void updateU() {
         // dJR / dU
-        SimpleMatrix dJRdU = delta2.mult(h.transpose()); // TODO not sure whether * (1 / m)?
+        SimpleMatrix dJdU = calc_unreg_dJdU();
         // add regularized term, lambda * sum_j sum_k U_jk
-        elementAdd(dJRdU, lambda * U.elementSum());
+        elementAdd(dJdU, lambda * U.elementSum());
         // update U by SGD
-        U = U.minus(dJRdU.scale(alpha));
+        U = U.minus(dJdU.scale(alpha));
+    }
+    
+    private SimpleMatrix calc_unreg_dJdU() {
+        return delta2.mult(h.transpose()); // TODO not sure whether * (1 / m)?
+    }
+    
+    private SimpleMatrix calc_unreg_dJdW() {
+        return delta2.mult(h.transpose()); // TODO not sure whether * (1 / m)?
     }
     
     // return a one vector of given dimension
