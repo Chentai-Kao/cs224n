@@ -129,7 +129,7 @@ public class WindowModel {
 
     private void buildXY(List<Datum> sentence, int start) { 
         // build x. concatenate input vector by [x_{i-1} x_i x_{i+1}]
-        SimpleMatrix x = new SimpleMatrix(windowSize * wordSize, 1);
+        x = new SimpleMatrix(windowSize * wordSize, 1);
         int pos = 0;
         for (int i = 0; i < windowSize; ++i) {
             String word = sentence.get(start + i).word;
