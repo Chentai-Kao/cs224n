@@ -56,11 +56,12 @@ public class FeatureFactory {
         allVecs = new SimpleMatrix(wordToNum.size(), 50);
         //set allVecs from filename
         BufferedReader in = new BufferedReader(new FileReader(vecFilename));
-        int index = 0;
+        int pos = 0;
         for (String line = in.readLine(); line != null; line = in.readLine()) {
             String[] vec = line.trim().split("\\s+");
             for (int i = 0; i < vec.length; ++i) {
-                allVecs.set(index, i, Double.parseDouble(vec[i]));
+                allVecs.set(pos, i, Double.parseDouble(vec[i]));
+                ++pos;
             }
         }
         in.close();
