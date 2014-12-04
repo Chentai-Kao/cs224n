@@ -64,7 +64,9 @@ public class WindowModel {
                 SimpleMatrix y = labelToY.get(centerWord.label);
                 System.out.println("(" + centerWord.word + "," + centerWord.label + ") => (y, x)");
                 System.out.println(x);
-                System.out.println(y);
+                for (int j = 0; j < y.numRows(); ++j) {
+                    System.out.println(y.get(j, 0));
+                }
                 System.console().readLine();
             }
         }
@@ -132,7 +134,7 @@ public class WindowModel {
     private SimpleMatrix buildX(List<Datum> sentence, int start) { 
         // concatenate input vector by [x_{i-1} x_i x_{i+1}]
         SimpleMatrix x = new SimpleMatrix(windowSize * wordSize, 1);
-        int index = 0;
+        int pos = 0;
         for (int i = 0; i < windowSize; ++i) {
             String word = sentence.get(start + i).word;
             if (!FeatureFactory.wordToNum.containsKey(word)) {
@@ -141,8 +143,8 @@ public class WindowModel {
             }
             int wordIndex = FeatureFactory.wordToNum.get(word);
             for (int j = 0; j < wordSize; ++j) {
-                x.set(index, 0, FeatureFactory.allVecs.get(wordIndex, j));
-                ++index;
+                x.set(pos, 0, FeatureFactory.allVecs.get(wordIndex, j));
+                ++pos;
             }
         }
         return x;
