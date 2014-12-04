@@ -71,10 +71,10 @@ public class WindowModel {
     
     private SimpleMatrix initMatrix(int fanIn, int fanOut) {
         double epsilon = Math.sqrt(6) / Math.sqrt(fanIn + fanOut);
-        SimpleMatrix V = SimpleMatrix.random(fanIn, fanOut + 1, -epsilon, epsilon, new Random());
-        // initialize bias to zero
-        for (int i = 0; i < fanIn; ++i) {
-            V.set(i, fanOut - 1, 0);
+        SimpleMatrix V = SimpleMatrix.random(fanOut, fanIn + 1, -epsilon, epsilon, new Random());
+        // initialize intercept term (bias) to zero
+        for (int i = 0; i < fanOut; ++i) {
+            V.set(i, fanIn, 0);
         }
         return V;
     }
