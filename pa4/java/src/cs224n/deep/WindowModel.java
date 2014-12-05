@@ -196,8 +196,12 @@ public class WindowModel {
         return delta1.mult(x.transpose());
     }
     
-    private SimpleMatrix calcDJdb1() {
+    private SimpleMatrix calcDJdB1() {
         return delta1;
+    }
+    
+    private SimpleMatrix calcDJdB2() {
+        return delta2;
     }
 
     private SimpleMatrix calcDJdL() {
@@ -227,8 +231,25 @@ public class WindowModel {
         buildDelta();
         SimpleMatrix dJdU = calcDJdU();
         SimpleMatrix diffU = buildDiff(U);
-        System.out.println("gradient check U:" + (dJdU.normF() - diffU.normF()));
+        System.out.println("gradient check U: " + (dJdU.normF() - diffU.normF()));
         // check W
+        feedForward();
+        buildDelta();
+        SimpleMatrix dJdW = calcDJdW();
+        SimpleMatrix diffW = buildDiff(W);
+        System.out.println("gradient check W: " + (dJdW.normF() - diffW.normF()));
+        // check b1
+        feedForward();
+        buildDelta();
+        SimpleMatrix dJdB1 = calcDJdB1();
+        SimpleMatrix diffB1 = buildDiff(b1);
+        System.out.println("gradient check W: " + (dJdB1.normF() - diffB1.normF()));
+        // check b2
+        feedForward();
+        buildDelta();
+        SimpleMatrix dJdB2 = calcDJdB2();
+        SimpleMatrix diffB2 = buildDiff(b2);
+        System.out.println("gradient check W: " + (dJdB2.normF() - diffB2.normF()));
     }
     
     private SimpleMatrix buildDiff(SimpleMatrix m) {
