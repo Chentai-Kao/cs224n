@@ -130,11 +130,7 @@ public class WindowModel {
         for (int i = 0; i < classSize; ++i) {
             p.set(i, 0, Math.exp(q.get(i, 0))); // normalize later
         }
-        double norm = 0; // normalization
-        for (int i = 0; i < classSize; ++i) {
-            norm += p.get(i);
-        }
-        p.scale(1 / norm);
+        p.scale(1 / p.elementSum()); // normalization
     }
     
     private void backPropagation() {
@@ -228,7 +224,6 @@ public class WindowModel {
         buildDelta();
         SimpleMatrix dJdU = calcDJdU();
         SimpleMatrix diffU = buildDiffU();
-        System.out.println("result");
         System.out.println(dJdU.normF());
         System.out.println(diffU.normF());
     }
