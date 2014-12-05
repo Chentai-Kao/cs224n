@@ -226,28 +226,29 @@ public class WindowModel {
         feedForward();
         buildDelta();
         SimpleMatrix dJdU = calcDJdU();
-        SimpleMatrix diffU = buildDiffU();
+        SimpleMatrix diffU = buildDiff(U);
         System.out.println("gradient check U:" + (dJdU.normF() - diffU.normF()));
+        // check W
     }
     
-    private SimpleMatrix buildDiffU() {
-        SimpleMatrix diffU = new SimpleMatrix(U.numRows(), U.numCols());
-        for (int i = 0; i < U.numRows(); ++i) {
-            for (int j = 0; j < U.numCols(); ++j) {
-                double value = U.get(i, j);
+    private SimpleMatrix buildDiff(SimpleMatrix m) {
+        SimpleMatrix diff = new SimpleMatrix(m.numRows(), m.numCols());
+        for (int i = 0; i < m.numRows(); ++i) {
+            for (int j = 0; j < m.numCols(); ++j) {
+                double value = m.get(i, j);
                 // positive
-                U.set(i, j, value + gradientCheckEpsilon);
+                m.set(i, j, value + gradientCheckEpsilon);
                 feedForward();
                 double pos = calcCost();
                 // negative
-                U.set(i, j, value - gradientCheckEpsilon);
+                m.set(i, j, value - gradientCheckEpsilon);
                 feedForward();
                 double neg = calcCost();
-                diffU.set(i, j, (pos - neg) / (2 * gradientCheckEpsilon));
+                diff.set(i, j, (pos - neg) / (2 * gradientCheckEpsilon));
                 // recover U
-                U.set(i, j, value);
+                m.set(i, j, value);
             }
         }
-        return diffU;
+        return diff;
     }
 }
