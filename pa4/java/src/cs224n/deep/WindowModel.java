@@ -63,7 +63,6 @@ public class WindowModel {
         for (List<Datum> sentence : sentences) {
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                 buildXY(sentence, i);
-                System.console().readLine();
                 feedForward();
                 buildDelta();
                 backPropagation();
