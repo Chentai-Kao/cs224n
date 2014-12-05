@@ -14,7 +14,10 @@ public class WindowModel {
     private SimpleMatrix x, y; // current data
     private SimpleMatrix p, q, h, z, b1, b2, delta1, delta2; // row-vector, updated by feedForward()
     private double alpha, lambda; // learning rate alpha, regularization lambda
-    private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y 
+    private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y
+    private boolean gradientCheck; // true to perform gradient check
+    private int gradientCheckSize; // sample size for gradient check
+    private double gradientCheckEpsilon; // epsilon for gradient check
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
 
@@ -25,6 +28,9 @@ public class WindowModel {
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
         wordVectorSize = wordSize * windowSize;
+        gradientCheck = true;
+        gradientCheckSize = 10;
+        gradientCheckEpsilon = 0.0001;
         alpha = 0.001;
         lambda = 1;
         String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
@@ -63,9 +69,14 @@ public class WindowModel {
         for (List<Datum> sentence : sentences) {
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                 buildXY(sentence, i);
-                feedForward();
-                buildDelta();
-                backPropagation();
+                if (gradientCheck && i < gradientCheckSize) {
+                    System.out.println("Gradient check ---");
+                    gradientCheck();
+                } else {
+                    feedForward();
+                    buildDelta();
+                    backPropagation();
+                }
             }
         }
     }
@@ -127,9 +138,9 @@ public class WindowModel {
     
     private void backPropagation() {
         // TODO
-        calc_unreg_dJdU(); // remove this, just debug
-        calc_unreg_dJdW(); // remove this, just debug
-        calc_unreg_dJdL(); // remove this, just debug
+        SimpleMatrix dJdU = calc_unreg_dJdU(); // remove this, just debug
+        SimpleMatrix dJdW = calc_unreg_dJdW(); // remove this, just debug
+        SimpleMatrix dJdL = calc_unreg_dJdL(); // remove this, just debug
     }
 
     private void buildXY(List<Datum> sentence, int start) { 
@@ -170,34 +181,35 @@ public class WindowModel {
     // given data (x, y), update U by SGD of dJ_R / dU.
     private void updateU() {
         // dJR / dU
-        SimpleMatrix dJdU = calc_unreg_dJdU();
+        SimpleMatrix dJdU = calcDJdU();
         // add regularized term, lambda * sum_j sum_k U_jk
         elementAdd(dJdU, lambda * U.elementSum());
         // update U by SGD
         U = U.minus(dJdU.scale(alpha));
     }
     
-    private SimpleMatrix calc_unreg_dJdU() {
+    private SimpleMatrix calcDJdU() {
         return delta2.mult(h.transpose()); // TODO not sure whether * (1 / m)?
     }
     
-    private SimpleMatrix calc_unreg_dJdW() {
+    private SimpleMatrix calcDJdW() {
         return delta1.mult(x.transpose()); // TODO not sure whether * (1 / m)?
     }
     
-    private SimpleMatrix calc_unreg_dJdb1() {
+    private SimpleMatrix calcDJdb1() {
         return delta1; // TODO not sure whether * (1 / m)?
     }
 
-    private SimpleMatrix calc_unreg_dJdL() {
+    private SimpleMatrix calcDJdL() {
         return W.transpose().mult(delta1); // TODO not sure whether * (1 / m)?
     }
     
-    // return a one vector of given dimension
-    private SimpleMatrix ones(int numRows, int numCols) {
-        SimpleMatrix m = new SimpleMatrix(numRows, numCols);
-        m.set(1);
-        return m;
+    private double calcCost() {
+        double sum = 0;
+        for (int i = 0; i < classSize; ++i) {
+            sum += y.get(i, 0) * Math.log(p.get(i, 0));
+        }
+        return -sum;
     }
     
     // perform elementwise add on the matrix
@@ -207,5 +219,35 @@ public class WindowModel {
                 m.set(i, j, v + m.get(i, j));
             }
         }
+    }
+    
+    private void gradientCheck() {
+        // check U
+        SimpleMatrix dJdU = calcDJdU();
+        SimpleMatrix diffU = buildDiffU();
+        System.out.println("result");
+        System.out.println(dJdU.normF());
+        System.out.println(diffU.normF());
+    }
+    
+    private SimpleMatrix buildDiffU() {
+        SimpleMatrix posU = new SimpleMatrix(U.numRows(), U.numCols());
+        SimpleMatrix negU = new SimpleMatrix(U.numRows(), U.numCols());
+        for (int i = 0; i < U.numRows(); ++i) {
+            for (int j = 0; j < U.numCols(); ++j) {
+                double value = U.get(i, j);
+                // positive
+                U.set(i, j, value + gradientCheckEpsilon);
+                feedForward();
+                posU.set(i, j, calcCost());
+                // negative
+                U.set(i, j, value - gradientCheckEpsilon);
+                feedForward();
+                negU.set(i, j, calcCost());
+                // recover U
+                U.set(i, j, value);
+            }
+        }
+        return posU.minus(negU).scale(1 / (2 * gradientCheckEpsilon));
     }
 }
