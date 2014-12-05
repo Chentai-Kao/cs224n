@@ -72,6 +72,7 @@ public class WindowModel {
                 if (gradientCheck && gradientCheckCount < 10) {
                     System.out.println("Gradient check ---");
                     gradientCheck();
+                    ++gradientCheckCount;
                 } else {
                     feedForward();
                     buildDelta();
@@ -222,7 +223,6 @@ public class WindowModel {
     }
     
     private void gradientCheck() {
-        ++gradientCheckCount;
         // check U
         feedForward();
         buildDelta();
