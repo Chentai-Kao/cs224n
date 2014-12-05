@@ -28,7 +28,7 @@ public class WindowModel {
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
         wordVectorSize = wordSize * windowSize;
-        gradientCheck = true;
+        gradientCheck = false;
         gradientCheckCount = 0;
         gradientCheckEpsilon = 0.0001;
         alpha = 0.001;
@@ -180,7 +180,7 @@ public class WindowModel {
     
     // given data (x, y), update U by SGD of dJ_R / dU.
     private void updateU() {
-        // dJR / dU
+        // dJ / dU
         SimpleMatrix dJdU = calcDJdU();
         // add regularized term, lambda * sum_j sum_k U_jk
         elementAdd(dJdU, lambda * U.elementSum());
@@ -189,11 +189,11 @@ public class WindowModel {
     }
     
     private SimpleMatrix calcDJdU() {
-        return delta2.mult(h.transpose());
+        return delta2.mult(h.transpose()).plus(U.scale(lambda));
     }
     
     private SimpleMatrix calcDJdW() {
-        return delta1.mult(x.transpose());
+        return delta1.mult(x.transpose()).plus(W.scale(lambda));
     }
     
     private SimpleMatrix calcDJdB1() {
@@ -211,9 +211,10 @@ public class WindowModel {
     private double calcCost() {
         double sum = 0;
         for (int i = 0; i < classSize; ++i) {
-            sum += y.get(i, 0) * Math.log(p.get(i, 0));
+            sum -= y.get(i, 0) * Math.log(p.get(i, 0));
         }
-        return -sum;
+        sum += lambda / 2 * (Math.pow(W.normF(), 2) + Math.pow(U.normF(), 2));
+        return sum;
     }
     
     // perform elementwise add on the matrix
