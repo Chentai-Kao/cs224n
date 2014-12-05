@@ -28,8 +28,9 @@ public class WindowModel {
         alpha = 0.001;
         lambda = 1;
         String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
+        assert labels.length == classSize;
         labelToY = new HashMap<String, SimpleMatrix>();
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < classSize; ++i) {
             SimpleMatrix m = new SimpleMatrix(classSize, 1);
             m.zero();
             m.set(i, 0, 1);
