@@ -52,11 +52,15 @@ public class WindowModel {
         // initialize with bias inside as the last column
         // W for the hidden layer
         W = initMatrix(hiddenSize, wordVectorSize);
+        W.set(0.1);
         // U for the score
         U = initMatrix(classSize, hiddenSize);
+        U.set(0.1);
         // intercept term
         b1 = initMatrix(hiddenSize, 1);
+        b1.zero();
         b2 = initMatrix(classSize, 1);
+        b2.zero();
     }
 
 
@@ -70,7 +74,6 @@ public class WindowModel {
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                 buildXY(sentence, i);
                 if (gradientCheck && gradientCheckCount < 10) {
-                    System.out.println("Gradient check ---");
                     gradientCheck();
                     ++gradientCheckCount;
                 } else {
@@ -130,7 +133,7 @@ public class WindowModel {
         for (int i = 0; i < classSize; ++i) {
             p.set(i, 0, Math.exp(q.get(i, 0))); // normalize later
         }
-        p.scale(1 / p.elementSum()); // normalization
+        p = p.scale(1 / p.elementSum()); // normalization
     }
     
     private void backPropagation() {
@@ -224,14 +227,7 @@ public class WindowModel {
         buildDelta();
         SimpleMatrix dJdU = calcDJdU();
         SimpleMatrix diffU = buildDiffU();
-        //for (int i = 0; i < U.numRows(); ++i) {
-        //    for (int j = 0; j < U.numCols(); ++j) {
-        //        System.out.println("dJdU " + dJdU.get(i, j) + ", diffU " + diffU.get(i, j));
-        //    }
-        //    System.console().readLine();
-        //}
-        System.out.println(dJdU.normF());
-        System.out.println(diffU.normF());
+        System.out.println("gradient check U:" + (dJdU.normF() - diffU.normF()));
     }
     
     private SimpleMatrix buildDiffU() {
