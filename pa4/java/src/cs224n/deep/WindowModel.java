@@ -210,7 +210,7 @@ public class WindowModel {
         for (int i = 0; i < classSize; ++i) {
             sum += y.get(i, 0) * Math.log(p.get(i, 0));
         }
-        return -sum;
+        return sum;
     }
     
     // perform elementwise add on the matrix
