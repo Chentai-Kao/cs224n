@@ -55,7 +55,7 @@ public class WindowModel {
             labelToY.put(labels[i], m);
         }
         
-        outputCost = true;
+        outputCost = false;
     }
 
     /**
