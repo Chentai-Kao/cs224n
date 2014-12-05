@@ -30,7 +30,9 @@ public class WindowModel {
         String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
         labelToY = new HashMap<String, SimpleMatrix>();
         for (int i = 0; i < 5; ++i) {
-            labelToY.put(labels[i], ones(5, 1));
+            SimpleMatrix m = new SimpleMatrix(classSize, 1);
+            m.zero();
+            labelToY.put(labels[i], m);
         }
     }
 
@@ -146,6 +148,7 @@ public class WindowModel {
         }
         // build y
         Datum centerWord = sentence.get(start + windowSize / 2);
+        labelToY
         y = labelToY.get(centerWord.label);
     }
     
