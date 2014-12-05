@@ -82,7 +82,7 @@ public class WindowModel {
         PrintWriter costWriter = null;
         if (outputCost) {
             try {
-                costWriter = new PrintWriter("../cost.out");
+                costWriter = new PrintWriter(uniqueOutputName("../cost.out"));
             } catch (FileNotFoundException e) {
                 System.err.println("File not found error.");
             }
@@ -125,7 +125,7 @@ public class WindowModel {
         // TODO
         List<List<Datum>> sentences = extractSentences(testData);
         try {
-            PrintWriter writer = new PrintWriter("../window_model.out");
+            PrintWriter writer = new PrintWriter(uniqueOutputName("../window_model.out"));
             for (List<Datum> sentence : sentences) {
                 for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                     Datum centerWord = sentence.get(i + windowSize / 2);
@@ -139,6 +139,11 @@ public class WindowModel {
         } catch (FileNotFoundException e) {
             System.err.println("File not found error.");
         }
+    }
+    
+    // create unique output file name based on parameters
+    private String uniqueOutputName(String prefix) {
+        return prefix + "_lambda=" + lambda + "_alpha=" + alpha + "_hiddenSize=" + hiddenSize + "_windowSize=" + windowSize + "_epochs=" + epochs;
     }
     
     // decide label from the current prediction p
