@@ -23,20 +23,22 @@ public class WindowModel {
     private double gradientCheckEpsilon; // epsilon for gradient check
     private String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
     
-    public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
+    public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize, epochs;
 
-    public WindowModel(int _windowSize, int _hiddenSize, double _lr){
+    public WindowModel(double _lambda, double _alpha, int _hiddenSize, int _windowSize, int _epochs){
         //TODO
         wordSize = 50;
         classSize = 5; // output prediction of 5 classes
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
         wordVectorSize = wordSize * windowSize;
+        alpha = _alpha;
+        lambda = _lambda;
+        epochs = _epochs;
+        
         gradientCheck = false;
         gradientCheckCount = 0;
         gradientCheckEpsilon = 0.0001;
-        alpha = 0.001;
-        lambda = 0.01;
 
         assert labels.length == classSize;
         labelToY = new HashMap<String, SimpleMatrix>();
@@ -70,25 +72,27 @@ public class WindowModel {
     public void train(List<Datum> _trainData){
         // TODO
         List<List<Datum>> sentences = extractSentences(_trainData);
-        if (gradientCheck) {
-            for (List<Datum> sentence : sentences) {
-                for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
-                    if (gradientCheckCount >= 10) {
-                        return;
+        for (int i = 0; i < epochs; ++i) {
+            if (gradientCheck) {
+                for (List<Datum> sentence : sentences) {
+                    for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
+                        if (gradientCheckCount >= 10) {
+                            return;
+                        }
+                        buildXY(sentence, i);
+                        gradientCheck();
+                        ++gradientCheckCount;
                     }
-                    buildXY(sentence, i);
-                    gradientCheck();
-                    ++gradientCheckCount;
                 }
-            }
-        } else {
-            Collections.shuffle(sentences);
-            for (List<Datum> sentence : sentences) {
-                for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
-                    buildXY(sentence, i);
-                    feedForward();
-                    buildDelta();
-                    backPropagation();
+            } else {
+                Collections.shuffle(sentences);
+                for (List<Datum> sentence : sentences) {
+                    for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
+                        buildXY(sentence, i);
+                        feedForward();
+                        buildDelta();
+                        backPropagation();
+                    }
                 }
             }
         }
