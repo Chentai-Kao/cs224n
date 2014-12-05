@@ -127,8 +127,9 @@ public class WindowModel {
     
     private void backPropagation() {
         // TODO
-        calc_unreg_dJdU();
-        calc_unreg_dJdW();
+        calc_unreg_dJdU(); // remove this, just debug
+        calc_unreg_dJdW(); // remove this, just debug
+        calc_unreg_dJdL(); // remove this, just debug
     }
 
     private void buildXY(List<Datum> sentence, int start) { 
@@ -182,6 +183,14 @@ public class WindowModel {
     
     private SimpleMatrix calc_unreg_dJdW() {
         return delta1.mult(x.transpose()); // TODO not sure whether * (1 / m)?
+    }
+    
+    private SimpleMatrix calc_unreg_dJdb1() {
+        return delta1; // TODO not sure whether * (1 / m)?
+    }
+
+    private SimpleMatrix calc_unreg_dJdL() {
+        return W.transpose().mult(delta1); // TODO not sure whether * (1 / m)?
     }
     
     // return a one vector of given dimension
