@@ -16,7 +16,7 @@ public class WindowModel {
     private double alpha, lambda; // learning rate alpha, regularization lambda
     private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y
     private boolean gradientCheck; // true to perform gradient check
-    private int gradientCheckSize; // sample size for gradient check
+    private int gradientCheckCount; // sample size for gradient check
     private double gradientCheckEpsilon; // epsilon for gradient check
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
@@ -69,7 +69,7 @@ public class WindowModel {
         for (List<Datum> sentence : sentences) {
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                 buildXY(sentence, i);
-                if (gradientCheck && i < gradientCheckSize) {
+                if (gradientCheck && gradientCheckCount < 10) {
                     System.out.println("Gradient check ---");
                     gradientCheck();
                 } else {
