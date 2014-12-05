@@ -210,7 +210,7 @@ public class WindowModel {
         for (int i = 0; i < classSize; ++i) {
             sum += y.get(i, 0) * Math.log(p.get(i, 0));
         }
-        return sum;
+        return -sum;
     }
     
     // perform elementwise add on the matrix
@@ -234,23 +234,23 @@ public class WindowModel {
     }
     
     private SimpleMatrix buildDiffU() {
-        SimpleMatrix posU = new SimpleMatrix(U.numRows(), U.numCols());
-        SimpleMatrix negU = new SimpleMatrix(U.numRows(), U.numCols());
+        SimpleMatrix diffU = new SimpleMatrix(U.numRows(), U.numCols());
         for (int i = 0; i < U.numRows(); ++i) {
             for (int j = 0; j < U.numCols(); ++j) {
                 double value = U.get(i, j);
                 // positive
                 U.set(i, j, value + gradientCheckEpsilon);
                 feedForward();
-                posU.set(i, j, calcCost());
+                double pos = calcCost();
                 // negative
                 U.set(i, j, value - gradientCheckEpsilon);
                 feedForward();
-                negU.set(i, j, calcCost());
+                double neg = calcCost();
+                diffU.set(i, j, (pos - neg) / (2 * gradientCheckEpsilon));
                 // recover U
                 U.set(i, j, value);
             }
         }
-        return posU.minus(negU).scale(1 / (2 * gradientCheckEpsilon));
+        return diffU;
     }
 }
