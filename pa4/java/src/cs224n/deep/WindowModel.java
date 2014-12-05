@@ -224,6 +224,7 @@ public class WindowModel {
     private void gradientCheck() {
         // check U
         feedForward();
+        buildDelta();
         SimpleMatrix dJdU = calcDJdU();
         SimpleMatrix diffU = buildDiffU();
         System.out.println("result");
