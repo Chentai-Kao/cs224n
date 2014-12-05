@@ -9,7 +9,7 @@ import org.ejml.simple.SimpleMatrix;
 public class NER {
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 2) {
+        if (args.length < 7) {
             System.out.println("USAGE: java -cp classes NER ../data/train ../data/dev");
             return;
         }
