@@ -25,8 +25,8 @@ public class NER {
 
         // initialize model
         //BaselineModel model = new BaselineModel();
-        //WindowModel model = new WindowModel(5, 100, 0.001);
-        WindowModel model = new WindowModel(3, 100, 0.001);
+        WindowModel model = new WindowModel(5, 100, 0.001);
+        //WindowModel model = new WindowModel(3, 100, 0.001);
         model.initWeights();
 
         //TODO: Implement those two functions
