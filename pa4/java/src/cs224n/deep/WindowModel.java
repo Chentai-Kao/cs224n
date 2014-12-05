@@ -72,7 +72,7 @@ public class WindowModel {
     public void train(List<Datum> _trainData){
         // TODO
         List<List<Datum>> sentences = extractSentences(_trainData);
-        for (int i = 0; i < epochs; ++i) {
+        for (int _ = 0; _ < epochs; ++_) {
             if (gradientCheck) {
                 for (List<Datum> sentence : sentences) {
                     for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
