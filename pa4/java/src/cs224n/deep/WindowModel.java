@@ -138,9 +138,9 @@ public class WindowModel {
     
     private void backPropagation() {
         // TODO
-        SimpleMatrix dJdU = calc_unreg_dJdU(); // remove this, just debug
-        SimpleMatrix dJdW = calc_unreg_dJdW(); // remove this, just debug
-        SimpleMatrix dJdL = calc_unreg_dJdL(); // remove this, just debug
+        SimpleMatrix dJdU = calcDJdU(); // remove this, just debug
+        SimpleMatrix dJdW = calcDJdW(); // remove this, just debug
+        SimpleMatrix dJdL = calcDJdL(); // remove this, just debug
     }
 
     private void buildXY(List<Datum> sentence, int start) { 
