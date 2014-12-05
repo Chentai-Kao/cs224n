@@ -52,15 +52,11 @@ public class WindowModel {
         // initialize with bias inside as the last column
         // W for the hidden layer
         W = initMatrix(hiddenSize, wordVectorSize);
-        W.set(0.1);
         // U for the score
         U = initMatrix(classSize, hiddenSize);
-        U.set(0.1);
         // intercept term
         b1 = initMatrix(hiddenSize, 1);
-        b1.zero();
         b2 = initMatrix(classSize, 1);
-        b2.zero();
     }
 
 
