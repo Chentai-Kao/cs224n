@@ -32,6 +32,7 @@ public class WindowModel {
         for (int i = 0; i < 5; ++i) {
             SimpleMatrix m = new SimpleMatrix(classSize, 1);
             m.zero();
+            m.set(i, 0, 1);
             labelToY.put(labels[i], m);
         }
     }
