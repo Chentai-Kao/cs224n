@@ -28,7 +28,7 @@ public class WindowModel {
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
         wordVectorSize = wordSize * windowSize;
-        gradientCheck = false;
+        gradientCheck = true;
         gradientCheckCount = 0;
         gradientCheckEpsilon = 0.0001;
         alpha = 0.001;
