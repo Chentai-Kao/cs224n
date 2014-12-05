@@ -222,6 +222,7 @@ public class WindowModel {
     }
     
     private void gradientCheck() {
+        ++gradientCheckCount;
         // check U
         feedForward();
         buildDelta();
