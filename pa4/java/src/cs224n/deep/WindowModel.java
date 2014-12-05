@@ -227,12 +227,13 @@ public class WindowModel {
         int pos = 0;
         for (int i = 0; i < windowSize; ++i) {
             String word = sentence.get(start + i).word.toLowerCase();
+            if (word.matches("[.0-9]+")) {
+                // contains only digit and period, convert each digit to "DG"
+                word = word.replaceAll("[0-9]", "DG");
+            }
             if (!FeatureFactory.wordToNum.containsKey(word)) {
                 // word not found in vocabulary
                 word = "UUUNKKK";
-            } else if (word.matches("[.0-9]+")) {
-                // contains only digit and period, convert each digit to "DG"
-                word = word.replaceAll("[0-9]", "DG");
             }
             int wordIndex = FeatureFactory.wordToNum.get(word);
             wordIndices.add(wordIndex);
