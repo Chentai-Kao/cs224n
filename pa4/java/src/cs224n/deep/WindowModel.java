@@ -12,6 +12,7 @@ public class WindowModel {
 
     protected SimpleMatrix U, W, Wout;
     private SimpleMatrix x, y; // current data
+    private List<Integer> wordIndices; // Index of selected words. (for reference allVecs)
     private SimpleMatrix p, q, h, z, b1, b2, delta1, delta2; // row-vector, updated by feedForward()
     private double alpha, lambda; // learning rate alpha, regularization lambda
     private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y
@@ -28,7 +29,7 @@ public class WindowModel {
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
         wordVectorSize = wordSize * windowSize;
-        gradientCheck = true;
+        gradientCheck = false;
         gradientCheckCount = 0;
         gradientCheckEpsilon = 0.0001;
         alpha = 0.001;
@@ -133,15 +134,23 @@ public class WindowModel {
     }
     
     private void backPropagation() {
-        // TODO
-        SimpleMatrix dJdU = calcDJdU(); // remove this, just debug
-        SimpleMatrix dJdW = calcDJdW(); // remove this, just debug
-        SimpleMatrix dJdL = calcDJdL(); // remove this, just debug
+        SimpleMatrix dJdU = calcDJdU();
+        SimpleMatrix dJdW = calcDJdW();
+        SimpleMatrix dJdB1 = calcDJdB1();
+        SimpleMatrix dJdB2 = calcDJdB2();
+        SimpleMatrix dJdL = calcDJdL();
+        U = U.plus(dJdU.scale(-alpha));
+        W = W.plus(dJdW.scale(-alpha));
+        b1 = b1.plus(dJdB1.scale(-alpha));
+        b2 = b2.plus(dJdB2.scale(-alpha));
+        x = x.plus(dJdL.scale(-alpha));
+        updateAllVecs();
     }
 
     private void buildXY(List<Datum> sentence, int start) { 
         // build x. concatenate input vector by [x_{i-1} x_i x_{i+1}]
         x = new SimpleMatrix(windowSize * wordSize, 1);
+        wordIndices = new ArrayList<Integer>();
         int pos = 0;
         for (int i = 0; i < windowSize; ++i) {
             String word = sentence.get(start + i).word.toLowerCase();
@@ -153,6 +162,7 @@ public class WindowModel {
                 word = word.replaceAll("[0-9]", "DG");
             }
             int wordIndex = FeatureFactory.wordToNum.get(word);
+            wordIndices.add(wordIndex);
             for (int j = 0; j < wordSize; ++j) {
                 x.set(pos, 0, FeatureFactory.allVecs.get(wordIndex, j));
                 ++pos;
@@ -274,5 +284,16 @@ public class WindowModel {
             }
         }
         return diff;
+    }
+    
+    // Update allVecs by the new x.
+    private void updateAllVecs() {
+        int pos = 0;
+        for (Integer wordIndex : wordIndices) {
+            for (int i = 0; i < wordSize; ++i) {
+                FeatureFactory.allVecs.set(wordIndex, i, x.get(pos, 0));
+                ++pos;
+            }
+        }
     }
 }
