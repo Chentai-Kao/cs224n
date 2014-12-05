@@ -1,4 +1,6 @@
 package cs224n.deep;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.lang.*;
 import java.util.*;
 
@@ -19,6 +21,7 @@ public class WindowModel {
     private boolean gradientCheck; // true to perform gradient check
     private int gradientCheckCount; // sample size for gradient check
     private double gradientCheckEpsilon; // epsilon for gradient check
+    private String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize;
 
@@ -34,7 +37,7 @@ public class WindowModel {
         gradientCheckEpsilon = 0.0001;
         alpha = 0.001;
         lambda = 0.01;
-        String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
+
         assert labels.length == classSize;
         labelToY = new HashMap<String, SimpleMatrix>();
         for (int i = 0; i < classSize; ++i) {
@@ -79,6 +82,7 @@ public class WindowModel {
                 }
             }
         } else {
+            Collections.shuffle(sentences);
             for (List<Datum> sentence : sentences) {
                 for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                     buildXY(sentence, i);
@@ -93,6 +97,36 @@ public class WindowModel {
 
     public void test(List<Datum> testData){
         // TODO
+        List<List<Datum>> sentences = extractSentences(testData);
+        try {
+            PrintWriter writer = new PrintWriter("../window_model.out");
+            for (List<Datum> sentence : sentences) {
+                for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
+                    Datum centerWord = sentence.get(i + windowSize / 2);
+                    buildXY(sentence, i);
+                    feedForward();
+                    String label = decideLabel();
+                    writer.println(centerWord.word + '\t' + centerWord.label + '\t' + label);
+                }
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found error.");
+        }
+    }
+    
+    // decide label from the current prediction p
+    private String decideLabel() {
+        int labelIndex = 0;
+        double maxValue = -1;
+        for (int i = 0; i < p.numRows(); ++i) {
+            double v = p.get(i, 0);
+            if (v > maxValue) {
+                labelIndex = i;
+                maxValue = v;
+            }
+        }
+        return labels[labelIndex];
     }
     
     private SimpleMatrix initMatrix(int fanOut, int fanIn) {
