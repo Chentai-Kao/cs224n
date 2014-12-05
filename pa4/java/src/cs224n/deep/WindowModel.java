@@ -34,8 +34,6 @@ public class WindowModel {
             SimpleMatrix m = new SimpleMatrix(classSize, 1);
             m.zero();
             m.set(i, 0, 1);
-            System.out.println(labels[i]);
-            System.out.println(m);
             labelToY.put(labels[i], m);
         }
     }
@@ -65,9 +63,6 @@ public class WindowModel {
         for (List<Datum> sentence : sentences) {
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                 buildXY(sentence, i);
-                System.out.println(sentence.get(i + windowSize / 2));
-                System.out.println(x);
-                System.out.println(y);
                 System.console().readLine();
                 feedForward();
                 buildDelta();
