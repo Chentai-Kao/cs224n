@@ -65,6 +65,7 @@ public class WindowModel {
         for (List<Datum> sentence : sentences) {
             for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
                 buildXY(sentence, i);
+                System.out.println(sentence.get(i + windowSize / 2));
                 System.out.println(x);
                 System.out.println(y);
                 System.console().readLine();
@@ -139,10 +140,13 @@ public class WindowModel {
         x = new SimpleMatrix(windowSize * wordSize, 1);
         int pos = 0;
         for (int i = 0; i < windowSize; ++i) {
-            String word = sentence.get(start + i).word;
+            String word = sentence.get(start + i).word.toLowerCase();
             if (!FeatureFactory.wordToNum.containsKey(word)) {
                 // word not found in vocabulary
                 word = "UUUNKKK";
+            } else if (word.matches("[.0-9]+")) {
+                // contains only digit and period, convert each digit to "DG"
+                word = word.replaceAll("[0-9]", "DG");
             }
             int wordIndex = FeatureFactory.wordToNum.get(word);
             for (int j = 0; j < wordSize; ++j) {
