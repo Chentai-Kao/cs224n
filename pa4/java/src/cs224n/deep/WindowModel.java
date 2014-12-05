@@ -186,19 +186,19 @@ public class WindowModel {
     }
     
     private SimpleMatrix calcDJdU() {
-        return delta2.mult(h.transpose()); // TODO not sure whether * (1 / m)?
+        return delta2.mult(h.transpose());
     }
     
     private SimpleMatrix calcDJdW() {
-        return delta1.mult(x.transpose()); // TODO not sure whether * (1 / m)?
+        return delta1.mult(x.transpose());
     }
     
     private SimpleMatrix calcDJdb1() {
-        return delta1; // TODO not sure whether * (1 / m)?
+        return delta1;
     }
 
     private SimpleMatrix calcDJdL() {
-        return W.transpose().mult(delta1); // TODO not sure whether * (1 / m)?
+        return W.transpose().mult(delta1);
     }
     
     private double calcCost() {
