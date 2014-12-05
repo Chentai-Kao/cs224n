@@ -224,6 +224,12 @@ public class WindowModel {
         buildDelta();
         SimpleMatrix dJdU = calcDJdU();
         SimpleMatrix diffU = buildDiffU();
+        //for (int i = 0; i < U.numRows(); ++i) {
+        //    for (int j = 0; j < U.numCols(); ++j) {
+        //        System.out.println("dJdU " + dJdU.get(i, j) + ", diffU " + diffU.get(i, j));
+        //    }
+        //    System.console().readLine();
+        //}
         System.out.println(dJdU.normF());
         System.out.println(diffU.normF());
     }
