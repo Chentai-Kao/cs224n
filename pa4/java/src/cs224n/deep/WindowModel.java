@@ -17,11 +17,15 @@ public class WindowModel {
     private List<Integer> wordIndices; // Index of selected words. (for reference allVecs)
     private SimpleMatrix p, q, h, z, b1, b2, delta1, delta2; // row-vector, updated by feedForward()
     private double alpha, lambda; // learning rate alpha, regularization lambda
+    
     private HashMap<String, SimpleMatrix> labelToY; // mapping from label to y
+    private String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
+    
     private boolean gradientCheck; // true to perform gradient check
     private int gradientCheckCount; // sample size for gradient check
     private double gradientCheckEpsilon; // epsilon for gradient check
-    private String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
+       
+    private boolean outputCost; // true to output cost in SGD
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize, epochs;
 
@@ -36,10 +40,12 @@ public class WindowModel {
         lambda = _lambda;
         epochs = _epochs;
         
+        // gradient check
         gradientCheck = false;
         gradientCheckCount = 0;
         gradientCheckEpsilon = 0.0001;
 
+        // labels lookup
         assert labels.length == classSize;
         labelToY = new HashMap<String, SimpleMatrix>();
         for (int i = 0; i < classSize; ++i) {
@@ -48,6 +54,8 @@ public class WindowModel {
             m.set(i, 0, 1);
             labelToY.put(labels[i], m);
         }
+        
+        outputCost = true;
     }
 
     /**
@@ -65,12 +73,21 @@ public class WindowModel {
         b2 = initMatrix(classSize, 1);
     }
 
-
     /**
      * Simplest SGD training
      */
     public void train(List<Datum> _trainData){
         // TODO
+        // output cost change in SGD
+        PrintWriter costWriter = null;
+        if (outputCost) {
+            try {
+                costWriter = new PrintWriter("../cost.out");
+            } catch (FileNotFoundException e) {
+                System.err.println("File not found error.");
+            }
+        }
+        
         List<List<Datum>> sentences = extractSentences(_trainData);
         for (int _ = 0; _ < epochs; ++_) {
             if (gradientCheck) {
@@ -92,12 +109,17 @@ public class WindowModel {
                         feedForward();
                         buildDelta();
                         backPropagation();
+                        if (costWriter != null) {
+                            costWriter.println(calcCost());
+                        }
                     }
                 }
             }
         }
+        if (costWriter != null) {
+            costWriter.close();
+        }
     }
-
 
     public void test(List<Datum> testData){
         // TODO
