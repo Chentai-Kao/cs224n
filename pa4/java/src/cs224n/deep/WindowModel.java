@@ -148,7 +148,6 @@ public class WindowModel {
         }
         // build y
         Datum centerWord = sentence.get(start + windowSize / 2);
-        labelToY
         y = labelToY.get(centerWord.label);
     }
     
