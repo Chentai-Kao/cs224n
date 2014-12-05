@@ -223,6 +223,7 @@ public class WindowModel {
     
     private void gradientCheck() {
         // check U
+        feedForward();
         SimpleMatrix dJdU = calcDJdU();
         SimpleMatrix diffU = buildDiffU();
         System.out.println("result");
