@@ -34,6 +34,8 @@ public class WindowModel {
             SimpleMatrix m = new SimpleMatrix(classSize, 1);
             m.zero();
             m.set(i, 0, 1);
+            System.out.println(labels[i]);
+            System.out.println(m);
             labelToY.put(labels[i], m);
         }
     }
