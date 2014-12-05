@@ -29,11 +29,11 @@ public class WindowModel {
         windowSize = _windowSize;
         hiddenSize = _hiddenSize;
         wordVectorSize = wordSize * windowSize;
-        gradientCheck = false;
+        gradientCheck = true;
         gradientCheckCount = 0;
         gradientCheckEpsilon = 0.0001;
         alpha = 0.001;
-        lambda = 1;
+        lambda = 0.01;
         String[] labels = {"O", "LOC", "MISC", "ORG", "PER"};
         assert labels.length == classSize;
         labelToY = new HashMap<String, SimpleMatrix>();
@@ -67,13 +67,21 @@ public class WindowModel {
     public void train(List<Datum> _trainData){
         // TODO
         List<List<Datum>> sentences = extractSentences(_trainData);
-        for (List<Datum> sentence : sentences) {
-            for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
-                buildXY(sentence, i);
-                if (gradientCheck && gradientCheckCount < 10) {
+        if (gradientCheck) {
+            for (List<Datum> sentence : sentences) {
+                for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
+                    if (gradientCheckCount >= 10) {
+                        return;
+                    }
+                    buildXY(sentence, i);
                     gradientCheck();
                     ++gradientCheckCount;
-                } else {
+                }
+            }
+        } else {
+            for (List<Datum> sentence : sentences) {
+                for (int i = 0; i < sentence.size() - windowSize + 1; ++i) {
+                    buildXY(sentence, i);
                     feedForward();
                     buildDelta();
                     backPropagation();
