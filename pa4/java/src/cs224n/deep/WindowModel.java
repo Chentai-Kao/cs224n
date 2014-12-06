@@ -178,7 +178,14 @@ public class WindowModel {
             for (int j = i; j < trainData.size(); ++j) {
                 // find the end of sentence
                 if (trainData.get(j).word.equals("</s>")) {
-                    sentence = trainData.subList(i, j + 1);
+                    sentence = new ArrayList<Datum>();
+                    for (int k = 0; k < windowSize / 2; ++k) {
+                        sentence.add(new Datum("<s>", null));
+                    }
+                    sentence.addAll(trainData.subList(i + 1, j));
+                    for (int k = 0; k < windowSize / 2; ++k) {
+                        sentence.add(new Datum("</s>", null));
+                    }
                     break;
                 }
             }
