@@ -78,6 +78,8 @@ public class WindowModel {
      */
     public void train(List<Datum> _trainData){
         // TODO
+        // Whether to randomize allVecs
+        FeatureFactory.allVecs = initMatrix(FeatureFactory.wordToNum.size(), 50);
         // output cost change in SGD
         PrintWriter costWriter = null;
         if (outputCost) {
