@@ -1,0 +1,6 @@
+Our program is parameterized and should be run as follows:
+
+$ java -Xmx4g -cp "classes:extlib/*" cs224n.deep.NER ../data/train ../data/dev <lambda> <alpha> <hiddenSize> <windowSize> <numEpochs> -print
+
+For example:
+$ java -Xmx4g -cp "classes:extlib/*" cs224n.deep.NER ../data/train ../data/dev 0.001 0.0005 30 5 100 -print

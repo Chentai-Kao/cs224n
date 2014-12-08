@@ -47,7 +47,7 @@ public class WindowModel {
         gradientCheckEpsilon = 0.0001;
         
         // randomize allVecs
-        randomizeAllVecs = false;
+        randomizeAllVecs = true;
 
         // labels lookup
         assert labels.length == classSize;
