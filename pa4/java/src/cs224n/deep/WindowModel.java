@@ -25,6 +25,7 @@ public class WindowModel {
     private int gradientCheckCount; // sample size for gradient check
     private double gradientCheckEpsilon; // epsilon for gradient check
        
+    private boolean randomizeAllVecs; // true to randomly initialize allVecs
     private boolean outputCost; // true to output cost in SGD
     
     public int windowSize, wordSize, hiddenSize, classSize, wordVectorSize, epochs;
@@ -44,6 +45,9 @@ public class WindowModel {
         gradientCheck = false;
         gradientCheckCount = 0;
         gradientCheckEpsilon = 0.0001;
+        
+        // randomize allVecs
+        randomizeAllVecs = false;
 
         // labels lookup
         assert labels.length == classSize;
@@ -79,7 +83,9 @@ public class WindowModel {
     public void train(List<Datum> _trainData){
         // TODO
         // Whether to randomize allVecs
-        FeatureFactory.allVecs = initMatrix(FeatureFactory.wordToNum.size(), 50);
+        if (randomizeAllVecs) {
+            FeatureFactory.allVecs = initMatrix(FeatureFactory.wordToNum.size(), 50);
+        }
         // output cost change in SGD
         PrintWriter costWriter = null;
         if (outputCost) {
@@ -145,7 +151,7 @@ public class WindowModel {
     
     // create unique output file name based on parameters
     private String uniqueOutputName(String prefix) {
-        return prefix + "_lambda=" + lambda + "_alpha=" + alpha + "_hiddenSize=" + hiddenSize + "_windowSize=" + windowSize + "_epochs=" + epochs;
+        return prefix + "_lambda=" + lambda + "_alpha=" + alpha + "_hiddenSize=" + hiddenSize + "_windowSize=" + windowSize + "_epochs=" + epochs + "_randomAllVecs=" + randomizeAllVecs;
     }
     
     // decide label from the current prediction p
